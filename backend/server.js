@@ -1,8 +1,11 @@
 import express from "express";
 import dotenv from "dotenv";
+import {runQuery} from './config/connectToPG.js';
 
 dotenv.config();
+
 const app = express();
+runQuery();
 
 app.get('/',(req, res) =>{
     console.log(req);
