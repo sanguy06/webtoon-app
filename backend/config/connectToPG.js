@@ -11,7 +11,7 @@ const pool = new Pool({
     database: "webtoon-server"
 })
 
-
+/*
 const runQuery = async() => {
     try{
         const res = await pool.query(`SELECT * FROM users`);
@@ -23,5 +23,5 @@ const runQuery = async() => {
     }
     pool.end;
 }
-
-export{runQuery};
+*/
+export{pool};
