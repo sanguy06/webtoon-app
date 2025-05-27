@@ -11,17 +11,4 @@ const pool = new Pool({
     database: "webtoon-server"
 })
 
-/*
-const runQuery = async() => {
-    try{
-        const res = await pool.query(`SELECT * FROM users`);
-        console.log(res.rows);
-        console.log("Connected to database");
-    } catch (err)
-    {
-        console.log(err.message);
-    }
-    pool.end;
-}
-*/
 export{pool};
