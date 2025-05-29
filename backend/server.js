@@ -180,11 +180,17 @@ app.post('/users/:id/my-webtoons-update-ratings', async (req,res)=>{
     const{webtoonTitle, userRating} = req.body; 
     const userID = req.params.id;
     const smth = await pool.query(`SELECT webtoon_id FROM webtoons where title = $1`, [webtoonTitle]);
-    console.log(smth);
-    let webtoonID = smth.rows[0].webtoon_id;
     
-    await pool.query(`UPDATE user_ratings SET rating = $1 WHERE user_id = $2 AND webtoon_id = $3`, 
-        [userRating, userID, webtoonID]);
+    let webtoonID = smth.rows[0].webtoon_id;
+    try{
+        await pool.query(`UPDATE user_ratings SET rating = $1 WHERE user_id = $2 AND webtoon_id = $3`, 
+            [userRating, userID, webtoonID]);
+        res.send("Deleted");
+    }
+    catch(err)
+    {
+        console.log(err);
+    }
 });
 
 // Delete Webtoon from User
