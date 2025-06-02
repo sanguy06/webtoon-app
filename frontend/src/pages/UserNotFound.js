@@ -1,0 +1,57 @@
+import {Link, useNavigate} from "react-router-dom";
+import axios from "axios";
+import {useState} from "react";
+
+
+export default function UserNotFound() {
+    const[name, setName] = useState("");
+    const[password, setPassword] = useState("");
+    const navigate = useNavigate();
+    const handleClick = async (e) =>{
+        try
+        {
+            await axios.post("http://localhost:5555/users/login", {
+                user_name: name, 
+                passcode: password
+            })
+            .then(res => {
+                console.log(res.data);
+                if(res.data!==true)
+                {
+                    console.log("no");
+                    navigate("/usernotfound");
+                } else 
+                {
+                    console.log("authenticating");
+                    navigate("/auth");
+                }
+            })
+        
+            
+        } catch (err) {
+            console.log(err);
+        }
+           
+    }
+    return(
+        <div>
+            <h1>Login!</h1> 
+            <p>
+            Username
+            <input 
+                type="text"
+                value = {name}
+                onChange={(e)=>setName(e.target.value)}
+            />
+            Password
+            <input 
+                type="text"
+                value = {password}
+                onChange={(e)=>setPassword(e.target.value)}
+            />
+            <button onClick={handleClick}>Submit</button>
+            </p>
+            <h2>User Not Found</h2>
+        </div>
+    );
+}

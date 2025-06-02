@@ -1,4 +1,12 @@
 
+import {pool} from '../config/connectToPG.js';
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import cors from "cors";
+import axios from "axios";
+import * as cheerio from "cheerio";
+import {v4 as uuidv4} from "uuid";
+
 // Signup User
 const signupUser = async (req,res)=>{
         
@@ -19,15 +27,23 @@ const loginUser = async (req,res)=>{
     console.log(found.rows[0].passcode);
     if(found.rows.length<0)
     {
-        res.status(202).send("No match");
+        res.send(false);
+        //res.status(202).send("No match");
         return;
     }
     else 
     {        
         if(await bcrypt.compare(passcode, found.rows[0].passcode))
-            res.send("match found");
+        {
+            res.send(true);
+            console.log("match found");
+        }
         else 
-            res.send("not allowed"); 
+        {
+            res.send(false); 
+            console.log("not allowed");
+        }
+
     }
 };
 
@@ -37,8 +53,60 @@ const authUser = (req,res)=>{
     const {user_name, passcode} = req.body;  
     const user = {user_name, passcode};
     const accessToken = jwt.sign(user,process.env.ACCESS_TOKEN_SECRET);
-    res.json(user, accessToken);
+    
+    res.send(accessToken);
+    console.log("user is authenticated");
 };
+
+// Get Specific User
+const getUser = async(req,res)=> {
+    const {user_name, passcode} = req.body;
+    
+    const smth = await pool.query(`SELECT user_id from users where user_name = $1 AND passcode = $2`, 
+        [user_name, passcode]);
+    if(smth.rows.length ===0)
+    {
+        console.log("uh oh");
+    }
+    let userID = smth.rows[0].user_id;
+    res.send(userID);
+}
+
+// Token Authentication - should occur before accessing any user-specific data
+function authenticateToken(req,res,next){
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if(token == null) 
+    {
+        return res.sendStatus(401);
+    }
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err,user)=>{
+        if(err)
+            return res.sendStatus(403);
+        req.user = user;
+        next();
+    });
+    console.log("token authenticated");
+
+}
+
+
+
+const getUserWebtoons = async(req,res)=>
+{
+    const userID = req.params.id;
+    let userWebtoonIDs= [];
+    const userWebtoons = []
+    userWebtoonIDs = await pool.query(`SELECT webtoon_id FROM user_webtoons where user_id = $1`, [userID]);
+    for(let i = 0; i < userWebtoonIDs.rows.length; i++)
+    {
+        const webtoonTitle = await pool.query(`SELECT title FROM webtoons where webtoon_id = $1`, [userWebtoonIDs.rows[i].webtoon_id]);
+        userWebtoons.push(webtoonTitle);
+    }
+    res.send(userWebtoons);
+   
+   
+}
 
 // Add Webtoon to User
 const addWebtoon = async (req,res)=>{
@@ -142,19 +210,18 @@ const getWebtoonAuthors = async() => {
     }
 }
 
-// Token Authentication - should occur before accessing any user-specific data
-function authenticateToken(req,res,next){
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-    if(token == null) 
-    {
-        return res.sendStatus(401);
-    }
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err,user)=>{
-        if(err)
-            return res.sendStatus(403);
-        req.user = user;
-        next();
-    });
 
+
+export{
+    signupUser,
+    loginUser,
+    authUser, 
+    getUser,
+    getUserWebtoons,
+    addWebtoon,
+    addRating, 
+    updateRating,
+    fetchWebtoons,
+    authenticateToken,
+    deleteWebtoon
 }

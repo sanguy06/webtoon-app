@@ -8,7 +8,17 @@ import cors from "cors";
 import axios from "axios";
 import * as cheerio from "cheerio";
 import {v4 as uuidv4} from "uuid";
-import webtoonController from "./controllers/webtoonController.js";
+import {signupUser,
+    loginUser,
+    authUser, 
+    getUser,
+    getUserWebtoons,
+    addWebtoon,
+    addRating, 
+    updateRating,
+    fetchWebtoons,
+    authenticateToken,
+    deleteWebtoon} from "./controllers/webtoonController.js";
 dotenv.config();
 
 // Create an App
@@ -31,30 +41,33 @@ app.get('/users', async (req,res)=>{
 });
 
 // Signup user 
-app.post('/users/sign_up', webtoonController.signupUser);
+app.post('/users/sign_up', signupUser);
 
 // Login User 
-app.get('/users/login', webtoonController.loginUser);
+app.post('/users/login', loginUser);
 
 // Authenticate User
-app.post('/users/login/auth', webtoonController.authUser);
+app.post('/users/auth', authUser);
 
+app.get('/user', getUser);
 
 // Fetch All Webtoons 
-app.get('/webtoons', webtoonController.fetchWebtoons);
+app.get('/webtoons', fetchWebtoons);
 
+// Get Webtoons For Each User 
+app.get('/users/:id/my-webtoons', getUserWebtoons);
 
 // Add Webtoon to User
-app.post('/users/:id/my-webtoons', webtoonController.authenticateToken, webtoonController.addWebtoon);
+app.post('/users/:id/my-webtoons', addWebtoon);
 
 // Add User-Rating to Webtoon
-app.post('/users/:id/my-webtoons-ratings', webtoonController.authenticateToken, webtoonController.addRating);
+app.post('/users/:id/my-webtoons-ratings', addRating);
 
 // Update User Rating
-app.post('/users/:id/my-webtoons-update-ratings', webtoonController.authenticateToken, webtoonController.updateRating);
+app.post('/users/:id/my-webtoons-update-ratings', updateRating);
 
 // Delete Webtoon from User
-app.delete('/users/:id/my-webtoons', webtoonController.authenticateToken, webtoonController.deleteRating);
+app.delete('/users/:id/my-webtoons', deleteWebtoon);
 
 // Connect to localhost and Start Server
 const PORT = process.env.PORT;
