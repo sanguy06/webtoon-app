@@ -35,6 +35,7 @@ const loginUser = async (req,res)=>{
     {        
         if(await bcrypt.compare(passcode, found.rows[0].passcode))
         {
+            // generates access token associated with user
             const smth = await pool.query(`SELECT user_id FROM users WHERE user_name = $1 `, [user_name]);
             const user_id = smth.rows[0].user_id;
             const user = {user_name, user_id, passcode};
@@ -82,6 +83,7 @@ const getUser = async(req,res)=> {
 // Token Authentication - should occur before accessing any user-specific data
 function authenticateToken(req,res,next){
     const authHeader = req.headers['authorization'];
+    console.log(authHeader);
     const token = authHeader && authHeader.split(' ')[1];
     if(token == null) 
     {
@@ -101,16 +103,18 @@ function authenticateToken(req,res,next){
 
 const getUserWebtoons = async(req,res)=>
 {
+    
     const userID = req.user.user_id;
     let userWebtoonIDs= [];
-    const userWebtoons = []
+    const userWebtoons = [];
     userWebtoonIDs = await pool.query(`SELECT webtoon_id FROM user_webtoons where user_id = $1`, [userID]);
     for(let i = 0; i < userWebtoonIDs.rows.length; i++)
     {
-        const webtoonTitle = await pool.query(`SELECT title FROM webtoons where webtoon_id = $1`, [userWebtoonIDs.rows[i].webtoon_id]);
+        const smth = await pool.query(`SELECT title FROM webtoons where webtoon_id = $1`, [userWebtoonIDs.rows[i].webtoon_id]);
+        const webtoonTitle = smth.rows[0].title;
         userWebtoons.push(webtoonTitle);
     }
-    res.send(userWebtoons);
+    res.json(userWebtoons);
    
    
 }

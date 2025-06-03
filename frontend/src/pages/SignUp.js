@@ -9,7 +9,6 @@ export default function SignUp() {
     const[password,setPassword]=useState("");
     const navigate = useNavigate();
     
-    
     function navigateLogin(){
         try{
             navigate("/auth");
@@ -18,7 +17,6 @@ export default function SignUp() {
             console.log(err);
         }
     }
-
 
     const handleClick = async (e) =>{
         try{
@@ -36,7 +34,7 @@ export default function SignUp() {
                 user_name: name, 
                 passcode: password
             })
-            
+        
             await axios.post("http://localhost:5555/users/auth",{
                 user_name: name, 
                 passcode: password
@@ -49,8 +47,8 @@ export default function SignUp() {
         }
        
         navigateLogin();
-
     }
+    
     return (
     <div>
         <h1>Sign Up!</h1> 

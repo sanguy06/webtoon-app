@@ -16,14 +16,16 @@ export default function Login(){
         
             .then(res => {
                 console.log(res.data);
-                if(res.data!==true)
+                if(res.data===false)
                 {
                     console.log("no");
                     navigate("/usernotfound");
                 } else 
                 {
                     console.log("authenticating");
-                    navigate("/auth/:id");
+                    console.log(res.data.user.user_id);
+                    localStorage.setItem('accessToken', res.data.accessToken);
+                    navigate(`/users/${res.data.user.user_id}`);
                 }
             })
         
@@ -51,6 +53,7 @@ export default function Login(){
             />
             <button onClick={handleClick}>Submit</button>
             </p>
+           
         </div>
     );
 }

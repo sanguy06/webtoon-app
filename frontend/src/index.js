@@ -7,18 +7,25 @@ import AuthUser from './pages/AuthUser';
 import Login from './pages/Login';
 import UserNotFound from './pages/UserNotFound';
 import MyWebtoons from './pages/MyWebtoons';
+import SearchWebtoons from './pages/SearchWebtoons';
 import {StrictMode} from "react";
 import {createRoot} from "react-dom/client";
 import reportWebVitals from './reportWebVitals';
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 
+/*
+  user should be able to login and access their webtoons, add webtoons
+  should be a search/browse page 
+
+*/
 const router = createBrowserRouter([
    {path:"/", element: <App />},
     {path: "/signup", element: <SignUp />},
-    {path:"/auth", element:<AuthUser />},
+    {path:"/users/:id", element:<AuthUser />},
     {path:"/login", element:<Login />},
     {path:"/usernotfound", element:<UserNotFound />},
-    {path:"/my-webtoons", element:<MyWebtoons />},
+    {path:"/users/:id/my-webtoons", element:<MyWebtoons />},
+    {path:"users/:id/search-webtoons", element:<SearchWebtoons />},
 
 ]);
 createRoot(document.getElementById("root")).render(

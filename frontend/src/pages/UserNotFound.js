@@ -2,7 +2,6 @@ import {Link, useNavigate} from "react-router-dom";
 import axios from "axios";
 import {useState} from "react";
 
-
 export default function UserNotFound() {
     const[name, setName] = useState("");
     const[password, setPassword] = useState("");
@@ -16,17 +15,17 @@ export default function UserNotFound() {
             })
             .then(res => {
                 console.log(res.data);
-                if(res.data!==true)
+                if(res.data===false)
                 {
                     console.log("no");
                     navigate("/usernotfound");
                 } else 
                 {
                     console.log("authenticating");
-                    navigate("/auth");
+                    console.log(res.data.user.user_id);
+                    navigate(`/users/${res.data.user.user_id}`);
                 }
             })
-        
             
         } catch (err) {
             console.log(err);
