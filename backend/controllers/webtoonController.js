@@ -35,8 +35,13 @@ const loginUser = async (req,res)=>{
     {        
         if(await bcrypt.compare(passcode, found.rows[0].passcode))
         {
-            res.send(true);
+            const smth = await pool.query(`SELECT user_id FROM users WHERE user_name = $1 `, [user_name]);
+            const user_id = smth.rows[0].user_id;
+            const user = {user_name, user_id, passcode};
+            const accessToken = jwt.sign(user,process.env.ACCESS_TOKEN_SECRET);
+            res.json({user,accessToken});
             console.log("match found");
+
         }
         else 
         {
@@ -48,17 +53,19 @@ const loginUser = async (req,res)=>{
 };
 
 // Authenticate User
+
 const authUser = (req,res)=>{
 
     const {user_name, passcode} = req.body;  
     const user = {user_name, passcode};
     const accessToken = jwt.sign(user,process.env.ACCESS_TOKEN_SECRET);
     
-    res.send(accessToken);
+    res.send(user, accessToken);
     console.log("user is authenticated");
 };
 
 // Get Specific User
+
 const getUser = async(req,res)=> {
     const {user_name, passcode} = req.body;
     
@@ -94,7 +101,7 @@ function authenticateToken(req,res,next){
 
 const getUserWebtoons = async(req,res)=>
 {
-    const userID = req.params.id;
+    const userID = req.user.user_id;
     let userWebtoonIDs= [];
     const userWebtoons = []
     userWebtoonIDs = await pool.query(`SELECT webtoon_id FROM user_webtoons where user_id = $1`, [userID]);
@@ -110,18 +117,20 @@ const getUserWebtoons = async(req,res)=>
 
 // Add Webtoon to User
 const addWebtoon = async (req,res)=>{
-    const{webtoonTitle} = req.body;
-    const userID = req.params.id;
+   
+    const userID = req.user.user_id;
+    const {webtoonTitle} = req.body;
     const smth = await pool.query(`SELECT webtoon_id FROM webtoons where title = $1`, [webtoonTitle]);
     let webtoonID = smth.rows[0].webtoon_id;
-    await pool.query(`INSERT INTO user_webtoons (user_id, webtoon_id) VALUES($1,$2)`, [userID, webtoonID]);
+    //console.log(webtoonID);
+    await pool.query(`INSERT INTO user_webtoons (user_id, webtoon_id) VALUES($1,$2)`, [userID,webtoonID]);
     res.send(userID);
 };
 
 // Add User-Rating to Webtoon
 const addRating = async (req, res)=>{
+    const userID = req.user.user_id;
     const{webtoonTitle, user_rating} = req.body; 
-    const userID = req.params.id; 
 
     const smth = await pool.query(`SELECT webtoon_id FROM webtoons where title = $1`, [webtoonTitle]);
     let webtoonID = smth.rows[0].webtoon_id;
@@ -134,28 +143,30 @@ const addRating = async (req, res)=>{
 
 // Update User-Rating
 const updateRating = async (req,res)=>{
+    const userID = req.user.user_id;
     const{webtoonTitle, userRating} = req.body; 
-    const userID = req.params.id;
     const smth = await pool.query(`SELECT webtoon_id FROM webtoons where title = $1`, [webtoonTitle]);
     
     let webtoonID = smth.rows[0].webtoon_id;
     
     await pool.query(`UPDATE user_ratings SET rating = $1 WHERE user_id = $2 AND webtoon_id = $3`, 
         [userRating, userID, webtoonID]);
-    res.send("Deleted");
+    res.send(userRating);
     
 };
 
 // Delete Webtoon 
 const deleteWebtoon = async (req, res)=>{
- 
+    const userID = req.user.user_id;
+    console.log(userID);
     const{webtoonTitle} = req.body; 
     console.log(webtoonTitle);
-    const userID = req.params.id;
     const smth = await pool.query(`SELECT webtoon_id FROM webtoons where title = $1`, [webtoonTitle]);
     let webtoonID = smth.rows[0].webtoon_id;
-    await pool.query(`DELETE FROM ONLY user_webtoons WHERE webtoon_id = $1 AND user_id = $2`, [webtoonID, userID]);
-    
+    console.log(webtoonID);
+    await pool.query(`DELETE FROM user_webtoons WHERE webtoon_id = $1 AND user_id = $2`, [webtoonID, userID]);
+    await pool.query(`DELETE FROM user_ratings WHERE webtoon_id = $1 AND user_id = $2`, [webtoonID, userID]);
+    res.send("deleted");
 };
 
 // Fetch Webtoons - authors is not implemented yet
@@ -216,7 +227,7 @@ export{
     signupUser,
     loginUser,
     authUser, 
-    getUser,
+    getUser, 
     getUserWebtoons,
     addWebtoon,
     addRating, 

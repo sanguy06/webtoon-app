@@ -55,19 +55,19 @@ app.get('/user', getUser);
 app.get('/webtoons', fetchWebtoons);
 
 // Get Webtoons For Each User 
-app.get('/users/:id/my-webtoons', getUserWebtoons);
+app.get('/users/:id/my-webtoons', authenticateToken, getUserWebtoons);
 
 // Add Webtoon to User
-app.post('/users/:id/my-webtoons', addWebtoon);
+app.post('/users/:id/add-webtoons', authenticateToken, addWebtoon);
 
 // Add User-Rating to Webtoon
-app.post('/users/:id/my-webtoons-ratings', addRating);
+app.post('/users/:id/my-webtoons-ratings', authenticateToken, addRating);
 
 // Update User Rating
-app.post('/users/:id/my-webtoons-update-ratings', updateRating);
+app.post('/users/:id/my-webtoons-update-ratings', authenticateToken, updateRating);
 
 // Delete Webtoon from User
-app.delete('/users/:id/my-webtoons', deleteWebtoon);
+app.delete('/users/:id/my-webtoons', authenticateToken, deleteWebtoon);
 
 // Connect to localhost and Start Server
 const PORT = process.env.PORT;
