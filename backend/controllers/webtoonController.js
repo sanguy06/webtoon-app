@@ -178,8 +178,8 @@ const fetchWebtoons = async (req,res)=>{
     const webtoonTitles = await getWebtoonTitles();
     const webtoonAuthors = await getWebtoonAuthors();
     
-    await pool.query(`INSERT INTO webtoons (title, author) SELECT * FROM unnest($1::text[],$2::text[]) AS t(title, author)`, [webtoonTitles,webtoonAuthors]);
-    //await pool.query(`INSERT INTO webtoons (title) SELECT * FROM unnest ($1::text[])`, [webtoonTitles]);
+    //await pool.query(`INSERT INTO webtoons (title, author) SELECT * FROM unnest($1::text[],$2::text[]) AS t(title, author)`, [webtoonTitles,webtoonAuthors]);
+    await pool.query(`INSERT INTO webtoons (title) SELECT * FROM unnest ($1::text[])`, [webtoonTitles]);
     res.send(webtoonTitles);
     
 }
