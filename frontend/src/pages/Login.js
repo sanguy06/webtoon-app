@@ -24,8 +24,10 @@ export default function Login(){
                 {
                     console.log("authenticating");
                     console.log(res.data.user.user_id);
+                    console.log("access token at login is " + res.data.accessToken);
                     localStorage.setItem('accessToken', res.data.accessToken);
                     navigate(`/users/${res.data.user.user_id}`);
+                    console.log(localStorage.getItem("accessToken"));
                 }
             })
         

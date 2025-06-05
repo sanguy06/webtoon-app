@@ -83,8 +83,9 @@ const getUser = async(req,res)=> {
 // Token Authentication - should occur before accessing any user-specific data
 function authenticateToken(req,res,next){
     const authHeader = req.headers['authorization'];
-    console.log(authHeader);
+    console.log("authHeader is" + authHeader);
     const token = authHeader && authHeader.split(' ')[1];
+    console.log("token in server is " + token);
     if(token == null) 
     {
         return res.sendStatus(401);
@@ -108,6 +109,12 @@ const searchWebtoons = async (req,res) =>
     res.json(webtoonsSearched.rows);
 }   
 
+const displayWebtoonInfo = async(req,res) => {
+    const webtoonID = req.params.webtoonID; 
+    console.log(webtoonID);
+    const webtoonDisplayed = await pool.query(`SELECT * FROM webtoons where webtoon_id = $1`, [webtoonID]);
+    res.json(webtoonDisplayed.rows[0]);
+}
 const getUserWebtoons = async(req,res)=>
 {
     
@@ -238,6 +245,7 @@ export{
     authUser, 
     getUser, 
     searchWebtoons,
+    displayWebtoonInfo,
     getUserWebtoons,
     addWebtoon,
     addRating, 

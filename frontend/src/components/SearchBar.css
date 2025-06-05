@@ -27,3 +27,12 @@
 #search-icon {
     color: royalblue;
 }
+
+.result-buttons {
+    width: 100%; 
+    height: 65px;
+  background-color: white; 
+  display: flex; 
+  flex-direction: column; 
+  border-color: #dddd;
+}

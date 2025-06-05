@@ -1,12 +1,18 @@
 import axios from "axios";
 import {useState} from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function MyWebtoons () {
     const token = localStorage.getItem("accessToken");
     const [webtoons, setWebtoons] = useState([]);
+    const {id} = useParams();
+    const navigate = useNavigate();
+    const navigateToSearch = () => {
+        navigate(`/users/${id}/search-webtoons`);
+    }
     const getWebtoons = async(e) => {
         try{
-            await axios.get("http://localhost:5555/users/:id/my-webtoons", {
+            await axios.get(`http://localhost:5555/users/${id}/my-webtoons`, {
                 headers:{
                     Authorization: `Bearer ${token}`
                 }
@@ -38,6 +44,7 @@ export default function MyWebtoons () {
 
                 ))}
             </div>
+            <button onClick={navigateToSearch}>Search Library</button>
         </div>
     );
 }

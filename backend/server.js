@@ -13,6 +13,7 @@ import {signupUser,
     authUser, 
     getUser,
     searchWebtoons,
+    displayWebtoonInfo,
     getUserWebtoons,
     addWebtoon,
     addRating, 
@@ -57,6 +58,9 @@ app.get('/webtoons', fetchWebtoons);
 
 // Search Webtoons
 app.get('/search-webtoons', searchWebtoons);
+
+// Display Webtoon Info 
+app.post('/webtoon-info/:webtoonID', displayWebtoonInfo);
 
 // Get Webtoons For Each User 
 app.get('/users/:id/my-webtoons', authenticateToken, getUserWebtoons);
