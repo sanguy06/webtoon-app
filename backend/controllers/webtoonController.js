@@ -99,7 +99,14 @@ function authenticateToken(req,res,next){
 
 }
 
+const searchWebtoons = async (req,res) =>
+{
 
+    const {webtoonTitle} = req.query;
+    const webtoonsSearched= await pool.query(`SELECT * FROM webtoons where title ILIKE $1`, [`%${webtoonTitle}%`]);
+    console.log(webtoonsSearched.rows);
+    res.json(webtoonsSearched.rows);
+}   
 
 const getUserWebtoons = async(req,res)=>
 {
@@ -173,14 +180,12 @@ const deleteWebtoon = async (req, res)=>{
     res.send("deleted");
 };
 
-// Fetch Webtoons - authors is not implemented yet
+// DONT RUN THIS - it inserts webtoons into the database
 const fetchWebtoons = async (req,res)=>{
     const webtoonTitles = await getWebtoonTitles();
     const webtoonAuthors = await getWebtoonAuthors();
-    
-    //await pool.query(`INSERT INTO webtoons (title, author) SELECT * FROM unnest($1::text[],$2::text[]) AS t(title, author)`, [webtoonTitles,webtoonAuthors]);
-    await pool.query(`INSERT INTO webtoons (title) SELECT * FROM unnest ($1::text[])`, [webtoonTitles]);
-    res.send(webtoonTitles);
+    await pool.query(`INSERT INTO webtoons (title, author) SELECT * FROM unnest($1::text[],$2::text[]) AS t(title, author)`, [webtoonTitles,webtoonAuthors]);
+    //await pool.query(`INSERT INTO webtoons (title) SELECT * FROM unnest ($1::text[])`, [webtoonTitles]);
     
 }
 
@@ -232,6 +237,7 @@ export{
     loginUser,
     authUser, 
     getUser, 
+    searchWebtoons,
     getUserWebtoons,
     addWebtoon,
     addRating, 

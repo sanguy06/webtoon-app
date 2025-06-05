@@ -12,6 +12,7 @@ import {signupUser,
     loginUser,
     authUser, 
     getUser,
+    searchWebtoons,
     getUserWebtoons,
     addWebtoon,
     addRating, 
@@ -51,8 +52,11 @@ app.post('/users/auth', authUser);
 
 app.get('/user', getUser);
 
-// Fetch All Webtoons 
+// Fetch All Webtoons - DONT RUN THIS
 app.get('/webtoons', fetchWebtoons);
+
+// Search Webtoons
+app.get('/search-webtoons', searchWebtoons);
 
 // Get Webtoons For Each User 
 app.get('/users/:id/my-webtoons', authenticateToken, getUserWebtoons);

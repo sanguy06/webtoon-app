@@ -1,12 +1,6 @@
 import axios from "axios";
 import {useState} from "react";
 
-/*
-    need to grab user webtoons
-    extract titles 
-
-
- */
 export default function MyWebtoons () {
     const token = localStorage.getItem("accessToken");
     const [webtoons, setWebtoons] = useState([]);
