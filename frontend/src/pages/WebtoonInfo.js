@@ -9,8 +9,9 @@ import {Rating} from "@mui/material";
 
 
 /**--------------------- STILL NEEDS TO BE IMPLEMENTED ---------------------------//
- * deleteRating function - when rating is 0, that row should be deleted from user-ratings
- * when user adds a rating, it should also add that relation to user-webtoons data table 
+ * deleteRating function - when rating is 0, that row should be deleted from user-ratings - when 
+ * user chooses same rating twice should trigger the delete rating
+ * 
  * 
  * 
  */
@@ -66,9 +67,25 @@ export default function WebtoonInfo() {
     }
     
     const changeRating = async (value) => {
-        console.log("userRating at infoPage is " + value);
-        const ogRating = await axios.get(`http://localhost:5555/users/${id}/get-rating?webtoonTitle=${title}`, 
-            {
+        //console.log("userRating at infoPage is " + value);
+        const addWebton = await axios.get(`http://localhost:5555/users/${id}/my-webtoons`, {
+            headers:{
+                    Authorization: `Bearer ${token}`
+                }
+        })
+        .then(async res => {
+            if(!res.data.includes(title)){
+                await axios.post(`http://localhost:5555/users/${id}/add-webtoons`, {
+                    webtoonTitle: title
+                }, {
+                    headers:{
+                    Authorization: `Bearer ${token}`
+                }})
+            } 
+        });
+
+        
+        const ogRating = await axios.get(`http://localhost:5555/users/${id}/get-rating?webtoonTitle=${title}`, {
                 headers:{
                     Authorization: `Bearer ${token}`
                 }
@@ -112,7 +129,7 @@ export default function WebtoonInfo() {
                     precision={.5}
                 />   
             </div>
-            <button onClick={() => {navigate("/users/:id/my-webtoons")}}>Go to Library</button>
+            <button onClick={() => {navigate(`/users/${id}/my-webtoons`)}}>Go to Library</button>
         </div>
     )
 }

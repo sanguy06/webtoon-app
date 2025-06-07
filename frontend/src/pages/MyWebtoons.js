@@ -1,11 +1,20 @@
 import axios from "axios";
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import ClearIcon from '@mui/icons-material/Clear';
+import DeleteIcon from '@mui/icons-material/Delete';
+import {IconButton, Rating} from "@mui/material";
 
 export default function MyWebtoons () {
     const token = localStorage.getItem("accessToken");
     const [webtoons, setWebtoons] = useState([]);
+    const [userRating, setUserRating] = useState(0);
     const {id} = useParams();
+    
+    
+     useEffect(()=>{
+            getWebtoons();
+    }, []);
     const navigate = useNavigate();
     const navigateToSearch = () => {
         navigate(`/users/${id}/search-webtoons`);
@@ -24,24 +33,83 @@ export default function MyWebtoons () {
             console.log(err);
         }
     }
-    const webtoonsFormat = webtoons.map((webtoon)=>
-        <ul>{webtoon}</ul>
-    );
+
+    const handleDelete = async (title) => {
+        await axios.delete(`http://localhost:5555/users/${id}/my-webtoons?webtoonTitle=${title}`, {
+            headers:{
+                Authorization: `Bearer ${token}`
+            }
+        })
+
+        getWebtoons();
+
+    }
+    const handleRatingChange = (value) =>{
+        setUserRating(value);
+        changeRating();
+    }
+    
+    const changeRating = async (rating, title) => {
+        //console.log("userRating at infoPage is " + value);
+        
+        const ogRating = await axios.get(`http://localhost:5555/users/${id}/get-rating?webtoonTitle=${title}`, {
+                headers:{
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            //.then ((res) => {(console.log(res.data))});
+          
+        if(ogRating.data==="")
+        {
+            await axios.post(`http://localhost:5555/users/${id}/my-webtoons-ratings`, {
+            webtoonTitle: title, 
+            userRating: rating}, 
+            {
+                headers:{
+                    Authorization: `Bearer ${token}`
+                }
+            })
+        } else 
+        {
+        await axios.post(`http://localhost:5555/users/${id}/update-my-webtoons-ratings`, {
+            webtoonTitle: title, 
+            userRating: rating } ,
+            {
+                headers:{
+                    Authorization: `Bearer ${token}`
+                }
+            })
+        }
+    }
     return (
         <div>
             <h1>My Webtoons</h1>
-            <button onClick={getWebtoons}></button>
+       
             <div style={{display:'flex', gap:'10px'}}>
                 {webtoons.map((item,index)=> (
                    <div key={index} style={{
-                    width:'100px', 
-                    height: '100px', 
+                    width:'150px', 
+                    height: '150px', 
                     backgroundColor: 'pink',
                     border: '1px solid black',
                    }}>
-                    {item}
+                    
+                     <b>{item.title}</b> <div style={{marginLeft:"auto"}}> 
+                        <IconButton onClick={() => handleDelete(item.title)}><DeleteIcon/></IconButton>
+                     </div>
+                    <br />
+                    By: {item.author}
+                    <br />
+                    <div style= {{paddingTop:"1vh"}}>
+                        <Rating 
+                            value= {userRating} 
+                            onChange={(e, newUserRating)=> {
+                                setUserRating(newUserRating);
+                                changeRating(newUserRating, item.title)}}
+                            precision={.5}
+                        />   
                     </div>
-
+                   </div>
                 ))}
             </div>
             <button onClick={navigateToSearch}>Search Library</button>
