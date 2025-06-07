@@ -16,6 +16,7 @@ import {signupUser,
     displayWebtoonInfo,
     getUserWebtoons,
     addWebtoon,
+    getRating,
     addRating, 
     updateRating,
     fetchWebtoons,
@@ -68,11 +69,14 @@ app.get('/users/:id/my-webtoons', authenticateToken, getUserWebtoons);
 // Add Webtoon to User
 app.post('/users/:id/add-webtoons', authenticateToken, addWebtoon);
 
+// Get User-Rating
+app.get('/users/:id/get-rating', authenticateToken, getRating);
+
 // Add User-Rating to Webtoon
 app.post('/users/:id/my-webtoons-ratings', authenticateToken, addRating);
 
 // Update User Rating
-app.post('/users/:id/my-webtoons-update-ratings', authenticateToken, updateRating);
+app.post('/users/:id/update-my-webtoons-ratings', authenticateToken, updateRating);
 
 // Delete Webtoon from User
 app.delete('/users/:id/my-webtoons', authenticateToken, deleteWebtoon);

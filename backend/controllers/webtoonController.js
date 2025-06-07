@@ -145,17 +145,34 @@ const addWebtoon = async (req,res)=>{
     res.send(userID);
 };
 
+// Get User-Rating 
+
+const getRating = async (req,res) => {
+    const userID = req.user.user_id;
+    const{webtoonTitle} = req.query; 
+    console.log(webtoonTitle);
+     const smth = await pool.query(`SELECT webtoon_id FROM webtoons where title = $1`, [webtoonTitle]);
+    let webtoonID = smth.rows[0].webtoon_id;
+    const smth2 = await pool.query(`SELECT rating FROM user_ratings where webtoon_id = $1 AND user_id = $2 `, 
+        [webtoonID, userID]);
+    if(smth2.rows.length ===0)
+        res.send("");
+    else 
+         res.send(smth2.rows[0].rating);
+}
+
 // Add User-Rating to Webtoon
 const addRating = async (req, res)=>{
+    console.log("ADDED");
     const userID = req.user.user_id;
-    const{webtoonTitle, user_rating} = req.body; 
-
+    const{webtoonTitle, userRating} = req.body; 
+    console.log("rating is " + userRating);
     const smth = await pool.query(`SELECT webtoon_id FROM webtoons where title = $1`, [webtoonTitle]);
     let webtoonID = smth.rows[0].webtoon_id;
     console.log("The ID is" + webtoonID);
     await pool.query(`INSERT INTO user_ratings (user_id, webtoon_id, rating) VALUES ($1,$2,$3)`, 
-        [userID, webtoonID, user_rating]);
-    res.send(user_rating);
+        [userID, webtoonID, userRating]);
+    res.send(userRating);
 };
 
 
@@ -163,6 +180,8 @@ const addRating = async (req, res)=>{
 const updateRating = async (req,res)=>{
     const userID = req.user.user_id;
     const{webtoonTitle, userRating} = req.body; 
+    console.log("title is " + webtoonTitle);
+    console.log("rating is " + userRating);
     const smth = await pool.query(`SELECT webtoon_id FROM webtoons where title = $1`, [webtoonTitle]);
     
     let webtoonID = smth.rows[0].webtoon_id;
@@ -248,6 +267,7 @@ export{
     displayWebtoonInfo,
     getUserWebtoons,
     addWebtoon,
+    getRating,
     addRating, 
     updateRating,
     fetchWebtoons,
