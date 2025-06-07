@@ -153,7 +153,7 @@ const addWebtoon = async (req,res)=>{
     res.send(userID);
 };
 
-// Get User-Rating 
+// Get Rating
 
 const getRating = async (req,res) => {
     const userID = req.user.user_id;
@@ -167,6 +167,22 @@ const getRating = async (req,res) => {
         res.send("");
     else 
          res.send(smth2.rows[0].rating);
+}
+
+// Get All Ratings From a User
+const getUserRatings = async (req, res) => {
+    let userRatings = []; 
+    const userID = req.user.user_id; 
+    const ratings = await pool.query(`SELECT * FROM user_ratings where user_id = $1`, [userID]); 
+
+    for(let i = 0; i < ratings.rows.length; i++) {
+        const webtoonTitle = await pool.query(`SELECT title FROM webtoons where webtoon_id = $1`, 
+            [ratings.rows[i].webtoon_id]);
+        userRatings.push({rating: ratings.rows[i].rating, title: webtoonTitle.rows[0].title,});
+    }
+    res.send(userRatings);
+
+
 }
 
 // Add User-Rating to Webtoon
@@ -276,6 +292,7 @@ export{
     getUserWebtoons,
     addWebtoon,
     getRating,
+    getUserRatings,
     addRating, 
     updateRating,
     fetchWebtoons,

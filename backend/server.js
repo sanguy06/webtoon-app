@@ -17,6 +17,7 @@ import {signupUser,
     getUserWebtoons,
     addWebtoon,
     getRating,
+    getUserRatings,
     addRating, 
     updateRating,
     fetchWebtoons,
@@ -71,6 +72,9 @@ app.post('/users/:id/add-webtoons', authenticateToken, addWebtoon);
 
 // Get User-Rating
 app.get('/users/:id/get-rating', authenticateToken, getRating);
+
+// Get All Ratings from a User 
+app.get('/users/:id/get-my-ratings', authenticateToken, getUserRatings);
 
 // Add User-Rating to Webtoon
 app.post('/users/:id/my-webtoons-ratings', authenticateToken, addRating);

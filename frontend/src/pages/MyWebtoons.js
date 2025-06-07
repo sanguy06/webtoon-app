@@ -8,17 +8,18 @@ import {IconButton, Rating} from "@mui/material";
 export default function MyWebtoons () {
     const token = localStorage.getItem("accessToken");
     const [webtoons, setWebtoons] = useState([]);
-    const [userRating, setUserRating] = useState(0);
+    const [userRating, setUserRating] = useState([]);
     const {id} = useParams();
-    
     
      useEffect(()=>{
             getWebtoons();
+            getRating();
     }, []);
     const navigate = useNavigate();
     const navigateToSearch = () => {
         navigate(`/users/${id}/search-webtoons`);
     }
+
     const getWebtoons = async(e) => {
         try{
             await axios.get(`http://localhost:5555/users/${id}/my-webtoons`, {
@@ -28,12 +29,28 @@ export default function MyWebtoons () {
             })
             .then (res => {
                 setWebtoons(res.data);
+                console.log(res.data);
             })
         } catch (err){
             console.log(err);
         }
     }
-
+    
+    const getRating = async (e) => {
+        try {
+            await axios.get(`http://localhost:5555/users/${id}/get-my-ratings`, {
+                headers:{
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            .then (res => {
+                setUserRating(res.data);
+            })  
+        } catch (err) {
+            console.log(err);
+        }
+    }
+        
     const handleDelete = async (title) => {
         await axios.delete(`http://localhost:5555/users/${id}/my-webtoons?webtoonTitle=${title}`, {
             headers:{
@@ -44,10 +61,8 @@ export default function MyWebtoons () {
         getWebtoons();
 
     }
-    const handleRatingChange = (value) =>{
-        setUserRating(value);
-        changeRating();
-    }
+    
+    
     
     const changeRating = async (rating, title) => {
         //console.log("userRating at infoPage is " + value);
@@ -80,11 +95,12 @@ export default function MyWebtoons () {
                 }
             })
         }
+       getRating();
     }
     return (
         <div>
             <h1>My Webtoons</h1>
-       
+
             <div style={{display:'flex', gap:'10px'}}>
                 {webtoons.map((item,index)=> (
                    <div key={index} style={{
@@ -93,7 +109,6 @@ export default function MyWebtoons () {
                     backgroundColor: 'pink',
                     border: '1px solid black',
                    }}>
-                    
                      <b>{item.title}</b> <div style={{marginLeft:"auto"}}> 
                         <IconButton onClick={() => handleDelete(item.title)}><DeleteIcon/></IconButton>
                      </div>
@@ -102,13 +117,20 @@ export default function MyWebtoons () {
                     <br />
                     <div style= {{paddingTop:"1vh"}}>
                         <Rating 
-                            value= {userRating} 
-                            onChange={(e, newUserRating)=> {
-                                setUserRating(newUserRating);
-                                changeRating(newUserRating, item.title)}}
+                            value= {item.rating} 
+                            onChange={(e, newUserRating)=> {   
+                                setUserRating({rating: newUserRating, title: item.title}); 
+                                console.log(newUserRating);
+                                changeRating(newUserRating, item.title)
+                            }}
+                                /*
+                                setUserRating({rating: newUserRating, title: item.title});
+                                changeRating(newUserRating, item.title) }}*/
+                              // setWebtoons({title: item.title, author: item.author, rating: newUserRating})}}
                             precision={.5}
                         />   
                     </div>
+                   
                    </div>
                 ))}
             </div>
