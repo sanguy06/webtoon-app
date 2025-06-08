@@ -8,29 +8,25 @@ import {Rating} from "@mui/material";
 
 
 
-/**--------------------- STILL NEEDS TO BE IMPLEMENTED ---------------------------//
- * deleteRating function - when rating is 0, that row should be deleted from user-ratings - when 
- * user chooses same rating twice should trigger the delete rating
- * 
- * 
- * 
- */
 export default function WebtoonInfo() {
    
+    
     useEffect(()=>{
             fetchWebtoonInfo();
+            //getRating(); 
     }, []);
-    
+
     const navigate = useNavigate();
     const {id} = useParams();
     const {webtoonID} = useParams();
     const[title,setTitle] = useState("");
     const[author, setAuthor] = useState("");
     const[userRating, setUserRating] = useState(0);
+    const token = localStorage.getItem("accessToken");
 
     let webtoon; 
 
-    const token = localStorage.getItem("accessToken");
+    // grab info on that specific webtoon
     const fetchWebtoonInfo = async() => {
 
         webtoon = await axios.post(`http://localhost:5555/webtoon-info/${webtoonID}`);
@@ -38,12 +34,28 @@ export default function WebtoonInfo() {
         
         setTitle(webtoon.data.title);
         setAuthor(webtoon.data.author);
-        
+        getRating(webtoon.data.title);
+    }
+
+    // get user-rating - if it doesn't exist it is 0
+    const getRating = async(title) => {
+       
+        try {
+            await axios.get(`http://localhost:5555/users/${id}/get-rating?webtoonTitle=${title}`, {
+                headers:{
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            .then (res => {
+                setUserRating(res.data);
+            })  
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     const handleClick = async () => {
         
-        console.log("access token found in infoPage " + token);
         try{
             await axios.post(`http://localhost:5555/users/${id}/add-webtoons`, {webtoonTitle: title} , 
                 {
@@ -60,11 +72,10 @@ export default function WebtoonInfo() {
     }
          
     }
-
-    const handleRatingChange = (value) =>{
-        setUserRating(value);
-        changeRating();
-    }
+    
+   
+   
+    
     
     const changeRating = async (value) => {
         //console.log("userRating at infoPage is " + value);
@@ -74,7 +85,10 @@ export default function WebtoonInfo() {
                 }
         })
         .then(async res => {
-            if(!res.data.includes(title)){
+           
+            console.log(res.data)
+            if(!res.data.some(item=>item.title === title)){
+                console.log("smth happened");
                 await axios.post(`http://localhost:5555/users/${id}/add-webtoons`, {
                     webtoonTitle: title
                 }, {
@@ -82,6 +96,7 @@ export default function WebtoonInfo() {
                     Authorization: `Bearer ${token}`
                 }})
             } 
+
         });
 
         
@@ -115,6 +130,7 @@ export default function WebtoonInfo() {
         }
     }
 
+    
     return(
         <div>
             <h1>{title}</h1> 
@@ -124,7 +140,7 @@ export default function WebtoonInfo() {
                 <Rating 
                     value= {userRating} 
                     onChange={(e, newUserRating)=> {
-                        setUserRating(newUserRating);
+                        setUserRating(newUserRating );
                         changeRating(newUserRating)}}
                     precision={.5}
                 />   

@@ -9,12 +9,14 @@ export default function MyWebtoons () {
     const token = localStorage.getItem("accessToken");
     const [webtoons, setWebtoons] = useState([]);
     const [userRating, setUserRating] = useState([]);
+    const[webtoonID, setWebtoonID] = useState([]);
     const {id} = useParams();
     
      useEffect(()=>{
             getWebtoons();
             getRating();
     }, []);
+    
     const navigate = useNavigate();
     const navigateToSearch = () => {
         navigate(`/users/${id}/search-webtoons`);
@@ -29,22 +31,34 @@ export default function MyWebtoons () {
             })
             .then (res => {
                 setWebtoons(res.data);
-                console.log(res.data);
+               
             })
         } catch (err){
             console.log(err);
         }
     }
     
-    const getRating = async (e) => {
-        try {
-            await axios.get(`http://localhost:5555/users/${id}/get-my-ratings`, {
+    const getWebtoonID = async(e) => {
+         try{
+            await axios.get(`http://localhost:5555/users/${id}/my-webtoons`, {
                 headers:{
                     Authorization: `Bearer ${token}`
                 }
             })
             .then (res => {
+                setWebtoons(res.data);
+               
+            })
+        } catch (err){
+            console.log(err);
+        }
+    }
+    const getRating = async (e) => {
+        try {
+            await axios.get(`http://localhost:5555/users/${id}/get-my-ratings`)
+            .then (res => {
                 setUserRating(res.data);
+                console.log(userRating);
             })  
         } catch (err) {
             console.log(err);
@@ -65,14 +79,13 @@ export default function MyWebtoons () {
     
     
     const changeRating = async (rating, title) => {
-        //console.log("userRating at infoPage is " + value);
+    
         
         const ogRating = await axios.get(`http://localhost:5555/users/${id}/get-rating?webtoonTitle=${title}`, {
                 headers:{
                     Authorization: `Bearer ${token}`
                 }
             })
-            //.then ((res) => {(console.log(res.data))});
           
         if(ogRating.data==="")
         {
@@ -95,19 +108,31 @@ export default function MyWebtoons () {
                 }
             })
         }
-       getRating();
+       
+    }
+
+    const handleRatingChange = (index, newRating) => {
+        //<a href={`/users/${id}/webtoon-info/${webtoonID}`}>
+        setWebtoons(prev => 
+            prev.map((webtoon, i) => 
+            i === index ? {...webtoon, rating: newRating} : webtoon
+        )
+        );
     }
     return (
+        
         <div>
             <h1>My Webtoons</h1>
-
-            <div style={{display:'flex', gap:'10px'}}>
-                {webtoons.map((item,index)=> (
+            
+           <div style={{display:'flex', gap:'10px'}}>
+                {Array.isArray(webtoons) && webtoons.length > 0 && webtoons.map((item,index)=> (
+                   <a href={`/users/${id}/webtoon-info/${item.webtoonID}`}>
                    <div key={index} style={{
                     width:'150px', 
                     height: '150px', 
                     backgroundColor: 'pink',
                     border: '1px solid black',
+                    
                    }}>
                      <b>{item.title}</b> <div style={{marginLeft:"auto"}}> 
                         <IconButton onClick={() => handleDelete(item.title)}><DeleteIcon/></IconButton>
@@ -119,19 +144,15 @@ export default function MyWebtoons () {
                         <Rating 
                             value= {item.rating} 
                             onChange={(e, newUserRating)=> {   
-                                setUserRating({rating: newUserRating, title: item.title}); 
-                                console.log(newUserRating);
+                                handleRatingChange(index, newUserRating)
                                 changeRating(newUserRating, item.title)
                             }}
-                                /*
-                                setUserRating({rating: newUserRating, title: item.title});
-                                changeRating(newUserRating, item.title) }}*/
-                              // setWebtoons({title: item.title, author: item.author, rating: newUserRating})}}
                             precision={.5}
                         />   
                     </div>
                    
                    </div>
+                </a>
                 ))}
             </div>
             <button onClick={navigateToSearch}>Search Library</button>

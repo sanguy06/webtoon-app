@@ -109,6 +109,7 @@ const searchWebtoons = async (req,res) =>
     res.json(webtoonsSearched.rows);
 }   
 
+
 const displayWebtoonInfo = async(req,res) => {
     const webtoonID = req.params.webtoonID; 
     console.log(webtoonID);
@@ -135,9 +136,16 @@ const getUserWebtoons = async(req,res)=>
         if(smth3.rows.length>0) {
            userRating = smth3.rows[0].rating;
         } 
-        userWebtoons.push({title: webtoonTitle, author: webtoonAuthor, rating: userRating });
+        userWebtoons.push({title: webtoonTitle, author: webtoonAuthor, rating: userRating, webtoonID: userWebtoonIDs.rows[i].webtoon_id});
     }   
+    if (userWebtoons.length===0){
+        console.log("mhm");
+        res.send("")
+        
+    } else {
+        console.log("no");
     res.json(userWebtoons);
+    }
    
 }
 
@@ -166,7 +174,10 @@ const getRating = async (req,res) => {
     if(smth2.rows.length ===0)
         res.send("");
     else 
+    {
+        console.log(smth2.rows[0].rating)
          res.send(smth2.rows[0].rating);
+    }
 }
 
 // Get All Ratings From a User
@@ -212,6 +223,7 @@ const updateRating = async (req,res)=>{
     
     await pool.query(`UPDATE user_ratings SET rating = $1 WHERE user_id = $2 AND webtoon_id = $3`, 
         [userRating, userID, webtoonID]);
+    
     res.send(userRating);
     
 };
@@ -288,6 +300,7 @@ export{
     authUser, 
     getUser, 
     searchWebtoons,
+     
     displayWebtoonInfo,
     getUserWebtoons,
     addWebtoon,

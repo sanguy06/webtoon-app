@@ -13,6 +13,7 @@ import {signupUser,
     authUser, 
     getUser,
     searchWebtoons,
+   
     displayWebtoonInfo,
     getUserWebtoons,
     addWebtoon,
@@ -22,7 +23,8 @@ import {signupUser,
     updateRating,
     fetchWebtoons,
     authenticateToken,
-    deleteWebtoon} from "./controllers/webtoonController.js";
+    deleteWebtoon,
+   } from "./controllers/webtoonController.js";
 dotenv.config();
 
 // Create an App
@@ -60,6 +62,8 @@ app.get('/webtoons', fetchWebtoons);
 
 // Search Webtoons
 app.get('/search-webtoons', searchWebtoons);
+
+
 
 // Display Webtoon Info 
 app.post('/webtoon-info/:webtoonID', displayWebtoonInfo);
