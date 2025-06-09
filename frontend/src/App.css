@@ -23,6 +23,16 @@
   font-size: calc(10px + 2vmin);
   color: white;
 }
+* {
+  margin: 0; 
+  padding: 0; 
+  box-sizing: border-box; 
+}
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
 
 .App-link {
   color: #61dafb;
@@ -90,4 +100,15 @@
   max-height: 300px; 
   overflow-y: scroll;
 
+}
+
+@font-face {
+  font-family: "TitleFont"; 
+  
+  src: url('./assets/TitleFont.otf') format('opentype');
+}
+
+.custom-font {
+  font-family: "TitleFont"; 
+  color: purple;
 }

@@ -26,7 +26,7 @@ export default function Login(){
                     console.log(res.data.user.user_id);
                     console.log("access token at login is " + res.data.accessToken);
                     localStorage.setItem('accessToken', res.data.accessToken);
-                    navigate(`/users/${res.data.user.user_id}`);
+                    navigate(`/users/${res.data.user.user_id}/my-webtoons`);
                     console.log(localStorage.getItem("accessToken"));
                 }
             })
@@ -38,23 +38,49 @@ export default function Login(){
        
     }
     return(
-        <div>
-            <h1>Login!</h1> 
-            <p>
-            Username
+        <div style={{
+            backgroundColor:'pink', 
+            backgroundSize:'cover', 
+            height: '100vh', 
+            justifyContent:'center',
+            display: 'flex',
+            flexDirection:'column', 
+            textAlign: 'center'
+        }}
+        className="custom-font">
+            <h1 style={{fontSize:'40px'}}>Login!</h1> 
+            <div style={{
+                fontSize: '20px'
+            }}>
+            Username:    
             <input 
+                style={{
+                    marginLeft: '5px', 
+                    height: '25px'
+                    }}
                 type="text"
                 value = {name}
                 onChange={(e)=>setName(e.target.value)}
             />
-            Password
+            <br />
+            Password:    
             <input 
+                style={{marginLeft: '5px', 
+                    height: '25px'
+                }}
                 type="text"
                 value = {password}
                 onChange={(e)=>setPassword(e.target.value)}
             />
-            <button onClick={handleClick}>Submit</button>
-            </p>
+            <br />
+            <div style={{paddingTop: '5vh'}}>
+            <button style={{
+                backgroundColor: 'pink', 
+                color: 'black',     
+                padding: '10px 20px'
+            }} className="custom-font" onClick={handleClick}>Submit</button>
+            </div>
+            </div>
            
         </div>
     );

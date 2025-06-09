@@ -9,6 +9,7 @@ import UserNotFound from './pages/UserNotFound';
 import MyWebtoons from './pages/MyWebtoons';
 import SearchWebtoons from './pages/SearchWebtoons';
 import WebtoonInfo from './pages/WebtoonInfo';
+import HomePage from './pages/HomePage';
 import {StrictMode} from "react";
 import {createRoot} from "react-dom/client";
 import reportWebVitals from './reportWebVitals';
@@ -25,6 +26,7 @@ const router = createBrowserRouter([
     {path:"/users/:id", element:<AuthUser />},
     {path:"/login", element:<Login />},
     {path:"/usernotfound", element:<UserNotFound />},
+    {path:"/users/:id/home-page", element: <HomePage />},
     {path:"/users/:id/my-webtoons", element:<MyWebtoons />},
     {path:"/users/:id/search-webtoons", element:<SearchWebtoons />},
     {path:"/users/:id/webtoon-info/:webtoonID", element:<WebtoonInfo />}

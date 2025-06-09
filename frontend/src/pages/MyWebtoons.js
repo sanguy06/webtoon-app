@@ -5,6 +5,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {IconButton, Rating} from "@mui/material";
 
+
 export default function MyWebtoons () {
     const token = localStorage.getItem("accessToken");
     const [webtoons, setWebtoons] = useState([]);
@@ -120,11 +121,18 @@ export default function MyWebtoons () {
         );
     }
     return (
-        
-        <div>
-            <h1>My Webtoons</h1>
-            
-           <div style={{display:'flex', gap:'10px'}}>
+        <div style={{
+            backgroundColor:'pink',
+            backgroundSize: 'cover', 
+            height: '100vh'
+        }}>
+            <div className="custom-font">
+                
+                <p style={{paddingTop:'5vh'}}>Here's your current catalog</p>
+                
+            </div>
+            <div style={{display:'flex', gap:'10px', paddingTop: "5vh"}}>
+                
                 {Array.isArray(webtoons) && webtoons.length > 0 && webtoons.map((item,index)=> (
                    <a href={`/users/${id}/webtoon-info/${item.webtoonID}`}>
                    <div key={index} style={{
@@ -132,6 +140,7 @@ export default function MyWebtoons () {
                     height: '150px', 
                     backgroundColor: 'pink',
                     border: '1px solid black',
+                   
                     
                    }}>
                      <b>{item.title}</b> <div style={{marginLeft:"auto"}}> 
@@ -155,7 +164,7 @@ export default function MyWebtoons () {
                 </a>
                 ))}
             </div>
-            <button onClick={navigateToSearch}>Search Library</button>
+
         </div>
-    );
+    )
 }
