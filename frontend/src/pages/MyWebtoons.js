@@ -4,7 +4,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import ClearIcon from '@mui/icons-material/Clear';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {IconButton, Rating} from "@mui/material";
-
+import NavBar from "../components/NavBar";
+import "../components/SearchBar.css";
+import "../App.css";
 
 export default function MyWebtoons () {
     const token = localStorage.getItem("accessToken");
@@ -56,7 +58,10 @@ export default function MyWebtoons () {
     }
     const getRating = async (e) => {
         try {
-            await axios.get(`http://localhost:5555/users/${id}/get-my-ratings`)
+            await axios.get(`http://localhost:5555/users/${id}/get-my-ratings`, { 
+                headers:{
+                Authorization: `Bearer ${token}`
+            }})
             .then (res => {
                 setUserRating(res.data);
                 console.log(userRating);
@@ -114,6 +119,15 @@ export default function MyWebtoons () {
 
     const handleRatingChange = (index, newRating) => {
         //<a href={`/users/${id}/webtoon-info/${webtoonID}`}>
+        //{display:'flex', gap:'10px', paddingTop: "5vh"}
+        /**style={{
+                    width:'150px', 
+                    height: '150px', 
+                    backgroundColor: 'pink',
+                    border: '1px solid black',
+                   
+                    
+                   }} */
         setWebtoons(prev => 
             prev.map((webtoon, i) => 
             i === index ? {...webtoon, rating: newRating} : webtoon
@@ -127,23 +141,18 @@ export default function MyWebtoons () {
             height: '100vh'
         }}>
             <div className="custom-font">
-                
+                <NavBar />
                 <p style={{paddingTop:'5vh'}}>Here's your current catalog</p>
                 
             </div>
             <div style={{display:'flex', gap:'10px', paddingTop: "5vh"}}>
                 
                 {Array.isArray(webtoons) && webtoons.length > 0 && webtoons.map((item,index)=> (
-                   <a href={`/users/${id}/webtoon-info/${item.webtoonID}`}>
-                   <div key={index} style={{
-                    width:'150px', 
-                    height: '150px', 
-                    backgroundColor: 'pink',
-                    border: '1px solid black',
                    
-                    
-                   }}>
-                     <b>{item.title}</b> <div style={{marginLeft:"auto"}}> 
+                   <div key={index} className={"webtoon-wrapper custom-font"}>
+                    <a href={`/users/${id}/webtoon-info/${item.webtoonID}`}>
+                    <b>{item.title}</b> </a>
+                     <div style={{alignItems:"center"}}> 
                         <IconButton onClick={() => handleDelete(item.title)}><DeleteIcon/></IconButton>
                      </div>
                     <br />
@@ -161,7 +170,7 @@ export default function MyWebtoons () {
                     </div>
                    
                    </div>
-                </a>
+              
                 ))}
             </div>
 

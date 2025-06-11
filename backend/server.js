@@ -13,7 +13,6 @@ import {signupUser,
     authUser, 
     getUser,
     searchWebtoons,
-   
     displayWebtoonInfo,
     getUserWebtoons,
     addWebtoon,
@@ -24,6 +23,8 @@ import {signupUser,
     fetchWebtoons,
     authenticateToken,
     deleteWebtoon,
+    getWebtoonImages, 
+    addReview
    } from "./controllers/webtoonController.js";
 dotenv.config();
 
@@ -60,10 +61,9 @@ app.get('/user', getUser);
 // Fetch All Webtoons - DONT RUN THIS
 app.get('/webtoons', fetchWebtoons);
 
+//app.get('/get-webtoon-images', getWebtoonImages)
 // Search Webtoons
 app.get('/search-webtoons', searchWebtoons);
-
-
 
 // Display Webtoon Info 
 app.post('/webtoon-info/:webtoonID', displayWebtoonInfo);
@@ -86,6 +86,8 @@ app.post('/users/:id/my-webtoons-ratings', authenticateToken, addRating);
 // Update User Rating
 app.post('/users/:id/update-my-webtoons-ratings', authenticateToken, updateRating);
 
+app.post('/users/:id/add-review', authenticateToken, addReview);
+
 // Delete Webtoon from User
 app.delete('/users/:id/my-webtoons', authenticateToken, deleteWebtoon);
 
@@ -93,3 +95,4 @@ app.delete('/users/:id/my-webtoons', authenticateToken, deleteWebtoon);
 const PORT = process.env.PORT;
 app.listen(PORT, () =>
 console.log(`Server running on port ${PORT}`));
+

@@ -26,7 +26,7 @@ export default function Login(){
                     console.log(res.data.user.user_id);
                     console.log("access token at login is " + res.data.accessToken);
                     localStorage.setItem('accessToken', res.data.accessToken);
-                    navigate(`/users/${res.data.user.user_id}/my-webtoons`);
+                    navigate(`/users/${res.data.user.user_id}/home-page`);
                     console.log(localStorage.getItem("accessToken"));
                 }
             })

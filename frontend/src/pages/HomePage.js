@@ -6,9 +6,14 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import {Rating} from "@mui/material";
 import SearchBar from "../components/SearchBar";
 import SearchResultsList from "../components/SearchResultsList";
+import {SiBookstack} from "react-icons/si";
+import "../App.css";
+import SearchWebtoons from "./SearchWebtoons";
+import { FaSearch } from "react-icons/fa";
+import NavBar from "../components/NavBar";
 
 export default function HomePage() {
-    const id = useParams(); 
+    const {id} = useParams(); 
     const user_name = useParams();
 
     const token = localStorage.getItem("accessToken");
@@ -63,7 +68,10 @@ export default function HomePage() {
     }
     const getRating = async (e) => {
         try {
-            await axios.get(`http://localhost:5555/users/${id}/get-my-ratings`)
+            await axios.get(`http://localhost:5555/users/${id}/get-my-ratings`,  {
+            headers:{
+                Authorization: `Bearer ${token}`
+            } })
             .then (res => {
                 setUserRating(res.data);
                 console.log(userRating);
@@ -121,6 +129,10 @@ export default function HomePage() {
 
     const handleRatingChange = (index, newRating) => {
         //<a href={`/users/${id}/webtoon-info/${webtoonID}`}>
+        /**  width:'150px', 
+                    height: '150px', 
+                    backgroundColor: 'pink',
+                    border: '1px solid black', */
         setWebtoons(prev => 
             prev.map((webtoon, i) => 
             i === index ? {...webtoon, rating: newRating} : webtoon
@@ -133,26 +145,22 @@ export default function HomePage() {
             backgroundSize: 'cover', 
             height: '100vh'
         }}>
-            <div className="custom-font">
-                <h1>Welcome </h1>
-                <a href = {`/users/${id}/my-webtoons`}>
-                <p style={{paddingTop:'5vh'}}>Go to your library</p>
-                </a>
-                
-            </div>
+            
+           <NavBar />
+           <div className= "custom-font" style={{
+            paddingTop: "5vh",
+                paddingLeft: "5vh",
+                width:"200px",
+                alignContent: "center"
+           }}>
+            <a href={`/users/${id}/my-webtoons`}>View more in your library...</a>
+           </div>
             <div style={{display:'flex', gap:'10px', paddingTop: "5vh", marginLeft: '30px', flexDirection:'column'}}>
                 
                 {Array.isArray(webtoons) && webtoons.length > 0 && webtoons.map((item,index)=> (
                    <a href={`/users/${id}/webtoon-info/${item.webtoonID}`}>
-                   <div key={index} style={{
-                    width:'150px', 
-                    height: '150px', 
-                    backgroundColor: 'pink',
-                    border: '1px solid black',
-                   
-                    
-                   }}>
-                     <b>{item.title}</b> <div style={{marginLeft:"auto"}}> 
+                   <div key={index} className={"webtoon-wrapper custom-font"}>
+                     <b>{item.title}</b> <div style={{alignContent: "center"}}> 
                         <IconButton onClick={() => handleDelete(item.title)}><DeleteIcon/></IconButton>
                      </div>
                     <br />
@@ -173,14 +181,11 @@ export default function HomePage() {
                 </a>
                 ))}
             </div>
-            
-                <div>
-                            
-                            <div className="search-bar-container">
-                                <SearchBar setResults={setResults}/>
-                                <SearchResultsList results={results}/>
-                            </div>
-                        </div>
+            <div className="search-bar-container">
+                                       <SearchBar setResults={setResults}/>
+                                       <SearchResultsList results={results}/>
+                                   </div>
+                
             
 
         </div>

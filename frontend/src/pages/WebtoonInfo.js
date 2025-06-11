@@ -5,8 +5,10 @@ import {FaRegStar} from "react-icons/fa";
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import { IconButton } from "@mui/material";
 import {Rating} from "@mui/material";
+import NavBar from "../components/NavBar";
 
 
+import "../App.css";
 
 export default function WebtoonInfo() {
    
@@ -73,10 +75,6 @@ export default function WebtoonInfo() {
          
     }
     
-   
-   
-    
-    
     const changeRating = async (value) => {
         //console.log("userRating at infoPage is " + value);
         const addWebton = await axios.get(`http://localhost:5555/users/${id}/my-webtoons`, {
@@ -85,9 +83,8 @@ export default function WebtoonInfo() {
                 }
         })
         .then(async res => {
-           
-            console.log(res.data)
-            if(!res.data.some(item=>item.title === title)){
+            
+            if(res.data===""||!res.data.some(item=>item.title === title)){
                 console.log("smth happened");
                 await axios.post(`http://localhost:5555/users/${id}/add-webtoons`, {
                     webtoonTitle: title
@@ -132,10 +129,24 @@ export default function WebtoonInfo() {
 
     
     return(
-        <div>
+        <div style={{
+            backgroundColor: "pink", 
+            backgroundSize: "cover", 
+            height: "100vh", 
+            
+        }}>
+            <NavBar />
+            <div className="custom-font"
+            style={{
+                textAlign:"center", 
+                paddingTop: "5vh",
+                display: 'flex',
+                alignItems: "center",
+                justifyContent: "center",
+                flexDirection:"column"}}>
             <h1>{title}</h1> 
-            <p>By: {author}</p>
-            <button onClick={handleClick}>Add to library</button>
+            <p style={{fontSize:"20px"}}>By: {author}</p>
+            
             <div style= {{paddingTop:"5vh"}}>
                 <Rating 
                     value= {userRating} 
@@ -145,7 +156,15 @@ export default function WebtoonInfo() {
                     precision={.5}
                 />   
             </div>
-            <button onClick={() => {navigate(`/users/${id}/my-webtoons`)}}>Go to Library</button>
+            <button onClick={(handleClick)} style={{
+               
+                backgroundColor: 'pink', 
+                color: 'black',     
+                padding: '10px 20px', 
+                
+            }} className="custom-font">Add to library</button>
+            
+        </div>
         </div>
     )
 }

@@ -9,14 +9,7 @@ export default function SignUp() {
     const[password,setPassword]=useState("");
     const navigate = useNavigate();
     
-    function navigateLogin(){
-        try{
-            navigate("/auth");
-        } catch(err)
-        {
-            console.log(err);
-        }
-    }
+    
 
     const handleClick = async (e) =>{
         try{
@@ -30,23 +23,35 @@ export default function SignUp() {
             console.log(err);
         }
         try{
+        
             await axios.post("http://localhost:5555/users/login", {
                 user_name: name, 
                 passcode: password
             })
-        
-            await axios.post("http://localhost:5555/users/auth",{
-                user_name: name, 
-                passcode: password
+            .then(res => {
+                console.log(res.data);
+                if(res.data===false)
+                {
+                    console.log("no");
+                    navigate("/usernotfound");
+                } else 
+                {
+                    console.log("authenticating");
+                    console.log(res.data.user.user_id);
+                    console.log("access token at login is " + res.data.accessToken);
+                    localStorage.setItem('accessToken', res.data.accessToken);
+                    navigate(`/users/${res.data.user.user_id}/home-page`);
+                    console.log(localStorage.getItem("accessToken"));
+                }
             })
-            navigateLogin();
-
+        
+       
+           
         } catch(err)
         {
             console.log(err);
         }
        
-        navigateLogin();
     }
     
     return (

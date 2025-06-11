@@ -1,6 +1,7 @@
 
 
 import pkg from 'pg';
+
 const{Pool, Client} = pkg;
 
 const pool = new Pool({
@@ -10,5 +11,6 @@ const pool = new Pool({
     password: "cattran2006",
     database: "webtoon-server"
 })
+
 
 export{pool};

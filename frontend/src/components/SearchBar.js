@@ -24,7 +24,7 @@ export default function SearchBar({setResults}) {
     return (
         <div className="input-wrapper">
             <FaSearch id="search-icon" />
-            <input placeholder="Type to search..." value={input} onChange={(e) =>
+            <input style={{font: "custom-font"}}placeholder="Search webtoons..." value={input} onChange={(e) =>
                 handleChange(e.target.value)}
             />
             

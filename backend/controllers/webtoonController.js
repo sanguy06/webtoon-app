@@ -1,11 +1,13 @@
 
 import {pool} from '../config/connectToPG.js';
+//import { cloudinary } from '../config/connectToCloud.js';
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import cors from "cors";
 import axios from "axios";
 import * as cheerio from "cheerio";
 import {v4 as uuidv4} from "uuid";
+import puppeteer from 'puppeteer';
 
 // Signup User
 const signupUser = async (req,res)=>{
@@ -168,6 +170,7 @@ const getRating = async (req,res) => {
     const{webtoonTitle} = req.query; 
     console.log(webtoonTitle);
      const smth = await pool.query(`SELECT webtoon_id FROM webtoons where title = $1`, [webtoonTitle]);
+     console.log(smth);
     let webtoonID = smth.rows[0].webtoon_id;
     const smth2 = await pool.query(`SELECT rating FROM user_ratings where webtoon_id = $1 AND user_id = $2 `, 
         [webtoonID, userID]);
@@ -227,6 +230,13 @@ const updateRating = async (req,res)=>{
     res.send(userRating);
     
 };
+
+const addReview = async(req, res) => {
+    const userID = req.user.user_id; 
+    const{webtoonTitle, review} = req.body; 
+    
+
+}
 
 // Delete Webtoon 
 const deleteWebtoon = async (req, res)=>{
@@ -294,6 +304,34 @@ const getWebtoonAuthors = async() => {
 
 
 
+const getWebtoonImages = async () => {
+    try{
+        const browser = await puppeteer.launch(); 
+        const page = await browser.newPage(); 
+       
+        await page.goto('https://www.webtoons.com/en/originals', 
+            { referer: 'http://www.webtoons.com'} , 
+        );
+        
+        await page.locator('img[loading=lazy]').wait()
+        const images = Array.from(page.$$eval('img[loading=lazy]', imgs => imgs.map(img => img.getAttribute("src"))));
+        console.log(images);
+        for(const image of images) {
+            console.log("hi");
+            const result = await cloudinary.v2.uploader.upload(image);
+            console.log(result.secure_url);
+        }
+    } catch(err) 
+    {
+        console.log(err);
+    }
+    
+    
+}
+
+
+
+
 export{
     signupUser,
     loginUser,
@@ -310,5 +348,7 @@ export{
     updateRating,
     fetchWebtoons,
     authenticateToken,
-    deleteWebtoon
+    deleteWebtoon, 
+    getWebtoonImages, 
+    addReview
 }
