@@ -7,17 +7,23 @@ import {IconButton, Rating} from "@mui/material";
 import NavBar from "../components/NavBar";
 import "../components/SearchBar.css";
 import "../App.css";
+import Popup from "reactjs-popup"; 
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
 
 export default function MyWebtoons () {
     const token = localStorage.getItem("accessToken");
     const [webtoons, setWebtoons] = useState([]);
     const [userRating, setUserRating] = useState([]);
     const[webtoonID, setWebtoonID] = useState([]);
+    const[review, setReview] = useState([]);
+    const [openDialog, setOpenDialog] = useState();
     const {id} = useParams();
     
      useEffect(()=>{
             getWebtoons();
             getRating();
+            getReview();
     }, []);
     
     const navigate = useNavigate();
@@ -56,6 +62,7 @@ export default function MyWebtoons () {
             console.log(err);
         }
     }
+
     const getRating = async (e) => {
         try {
             await axios.get(`http://localhost:5555/users/${id}/get-my-ratings`, { 
@@ -64,13 +71,28 @@ export default function MyWebtoons () {
             }})
             .then (res => {
                 setUserRating(res.data);
-                console.log(userRating);
+                
             })  
         } catch (err) {
             console.log(err);
         }
+    }  
+    
+    const getReview = async(e) => {
+        try{
+            await axios.get(`http://localhost:5555/users/${id}/get-my-reviews`, { 
+                headers:{
+                Authorization: `Bearer ${token}`
+            }})
+            .then(res => {
+                setReview(res.data);
+                console.log(res.data);
+              
+            })
+        } catch(err) {
+            console.log(err);
+        }
     }
-        
     const handleDelete = async (title) => {
         await axios.delete(`http://localhost:5555/users/${id}/my-webtoons?webtoonTitle=${title}`, {
             headers:{
@@ -82,17 +104,13 @@ export default function MyWebtoons () {
 
     }
     
-    
-    
     const changeRating = async (rating, title) => {
-    
-        
+      
         const ogRating = await axios.get(`http://localhost:5555/users/${id}/get-rating?webtoonTitle=${title}`, {
                 headers:{
                     Authorization: `Bearer ${token}`
                 }
-            })
-          
+            }) 
         if(ogRating.data==="")
         {
             await axios.post(`http://localhost:5555/users/${id}/my-webtoons-ratings`, {
@@ -103,7 +121,8 @@ export default function MyWebtoons () {
                     Authorization: `Bearer ${token}`
                 }
             })
-        } else 
+        } 
+        else 
         {
         await axios.post(`http://localhost:5555/users/${id}/update-my-webtoons-ratings`, {
             webtoonTitle: title, 
@@ -114,26 +133,61 @@ export default function MyWebtoons () {
                 }
             })
         }
-       
     }
-
+    const changeReview = async(userReview, title) => {
+        /*
+        const ogReview = await axios.get(`http://localhost:5555/users/${id}/get-review?webtoonTitle=${title}`, {
+            headers: {
+                Authorization:  `Bearer ${token}`
+            }
+        })
+        if(ogReview.data==="")
+        {
+            await axios.post(`http://localhost:5555/users/${id}/add-review`, {
+            webtoonTitle: title, 
+            review: userReview}, 
+            {
+                headers:{
+                    Authorization: `Bearer ${token}`
+                }
+            })
+        } 
+        else {*/
+            await axios.post(`http://localhost:5555/users/${id}/update-review`, {
+                webtoonTitle: title, 
+                review: userReview } ,
+                {
+                    headers:{
+                        Authorization: `Bearer ${token}`
+                    }
+                })
+            
+        }
+    
     const handleRatingChange = (index, newRating) => {
-        //<a href={`/users/${id}/webtoon-info/${webtoonID}`}>
-        //{display:'flex', gap:'10px', paddingTop: "5vh"}
-        /**style={{
-                    width:'150px', 
-                    height: '150px', 
-                    backgroundColor: 'pink',
-                    border: '1px solid black',
-                   
-                    
-                   }} */
         setWebtoons(prev => 
             prev.map((webtoon, i) => 
             i === index ? {...webtoon, rating: newRating} : webtoon
         )
         );
     }
+
+    const handleReviewChange = (index, newReview) => {
+        setWebtoons(prev => 
+            prev.map((webtoon, i) => 
+            i === index ? {...webtoon, review: newReview} : webtoon
+        )
+        );
+    }
+
+    const handleOpenDialog = () => {
+        setOpenDialog(true); 
+    }
+
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+    }
+
     return (
         <div style={{
             backgroundColor:'pink',
@@ -167,6 +221,37 @@ export default function MyWebtoons () {
                             }}
                             precision={.5}
                         />   
+                    </div>
+                    <button onClick={handleOpenDialog}>Click</button>
+                    <div>
+
+                        <Dialog
+                            open={openDialog}
+                            onClose={handleCloseDialog}
+                        >
+                            <div style={{
+                                backgroundColor: "pink", 
+                                width: "500px", 
+                                height: "300px", 
+                                borderRadius: "10px", 
+                                justifyContent: "center",
+                                display: "flex", 
+                                flexDirection:"column"}}>
+                                <div style={{padding: "25px"}}>
+                                <textarea style={{
+                                    backgroundColor: "white", 
+                                    width: "450px", 
+                                    height: "250px",
+                                    display: "flex", 
+                                    borderRadius: "10px" }} 
+
+                                    value={item.review} 
+
+                                    onChange={(e)=>{setReview(e.target.value)}}></textarea>
+                                </div>
+                                <button onClick={changeReview}>Submit</button>
+                            </div>
+                        </Dialog> 
                     </div>
                    
                    </div>

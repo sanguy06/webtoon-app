@@ -24,7 +24,11 @@ import {signupUser,
     authenticateToken,
     deleteWebtoon,
     getWebtoonImages, 
-    addReview
+    getReview,
+    getUserReviews,
+    addReview, 
+    updateReview, 
+    deleteReview
    } from "./controllers/webtoonController.js";
 dotenv.config();
 
@@ -62,6 +66,7 @@ app.get('/user', getUser);
 app.get('/webtoons', fetchWebtoons);
 
 //app.get('/get-webtoon-images', getWebtoonImages)
+
 // Search Webtoons
 app.get('/search-webtoons', searchWebtoons);
 
@@ -86,7 +91,20 @@ app.post('/users/:id/my-webtoons-ratings', authenticateToken, addRating);
 // Update User Rating
 app.post('/users/:id/update-my-webtoons-ratings', authenticateToken, updateRating);
 
+// Get User-Review
+app.get('/users/:id/get-review', authenticateToken, getReview);
+
+// Get All Reviews From a User 
+app.get('/users/:id/get-my-reviews', authenticateToken, getUserReviews);
+
+// Add User-Review
 app.post('/users/:id/add-review', authenticateToken, addReview);
+
+// Update User-Review
+app.post('/users/:id/update-review', authenticateToken, updateReview);
+
+// Delete User-Review
+app.delete('/users/:id/delete-review', authenticateToken, deleteReview)
 
 // Delete Webtoon from User
 app.delete('/users/:id/my-webtoons', authenticateToken, deleteWebtoon);

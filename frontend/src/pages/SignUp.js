@@ -55,23 +55,49 @@ export default function SignUp() {
     }
     
     return (
-    <div>
-        <h1>Sign Up!</h1> 
-            <p>
-            Username
+    <div    
+        className="custom-font" 
+        style={{
+            backgroundColor:"pink", 
+            backgroundSize: "cover",
+            height: "100vh",
+            display:"flex",
+            textAlign:"center",
+            alignItems:"center",
+            justifyContent:"center", 
+            flexDirection:"column"}}>
+        <h1 style={{fontSize:'40px'}}>Sign Up!</h1> 
+            <div style={{fontSize:'20px'}}>
+            Username: 
             <input 
+               style={{
+                    marginLeft: '5px', 
+                    height: '25px'
+                }}
                 type="text"
                 value = {name}
                 onChange={(e)=>setName(e.target.value)}
             />
-            Password
+            <br/>
+            Password: 
             <input 
+                style={{
+                    marginLeft: '5px', 
+                    height: '25px'
+                }}
                 type="text"
                 value = {password}
                 onChange={(e)=>setPassword(e.target.value)}
             />
-            <button onClick={handleClick}>Submit</button>
-            </p>
+            <br/>
+            <div style={{paddingTop: '5vh'}}>
+            <button style={{
+                backgroundColor: 'pink', 
+                color: 'black',     
+                padding: '10px 20px'
+            }} className="custom-font"onClick={handleClick}>Submit</button>
+            </div>
+            </div>
     </div>
     );
 }

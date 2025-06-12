@@ -56,7 +56,6 @@ const loginUser = async (req,res)=>{
 };
 
 // Authenticate User
-
 const authUser = (req,res)=>{
 
     const {user_name, passcode} = req.body;  
@@ -68,7 +67,6 @@ const authUser = (req,res)=>{
 };
 
 // Get Specific User
-
 const getUser = async(req,res)=> {
     const {user_name, passcode} = req.body;
     
@@ -111,13 +109,13 @@ const searchWebtoons = async (req,res) =>
     res.json(webtoonsSearched.rows);
 }   
 
-
 const displayWebtoonInfo = async(req,res) => {
     const webtoonID = req.params.webtoonID; 
     console.log(webtoonID);
     const webtoonDisplayed = await pool.query(`SELECT * FROM webtoons where webtoon_id = $1`, [webtoonID]);
     res.json(webtoonDisplayed.rows[0]);
 }
+
 const getUserWebtoons = async(req,res)=>
 {
     
@@ -128,6 +126,7 @@ const getUserWebtoons = async(req,res)=>
     for(let i = 0; i < userWebtoonIDs.rows.length; i++)
     {
         let userRating = 0;
+        let userReview = "";
         const smth = await pool.query(`SELECT title FROM webtoons where webtoon_id = $1`, [userWebtoonIDs.rows[i].webtoon_id]);
         const webtoonTitle = smth.rows[0].title;
         const smth2 = await pool.query(`SELECT author FROM webtoons where webtoon_id = $1`, [userWebtoonIDs.rows[i].webtoon_id]);
@@ -138,7 +137,16 @@ const getUserWebtoons = async(req,res)=>
         if(smth3.rows.length>0) {
            userRating = smth3.rows[0].rating;
         } 
-        userWebtoons.push({title: webtoonTitle, author: webtoonAuthor, rating: userRating, webtoonID: userWebtoonIDs.rows[i].webtoon_id});
+         const smth4 = await pool.query(`SELECT review FROM user_reviews where webtoon_id = $1 AND user_id = $2`, 
+            [userWebtoonIDs.rows[i].webtoon_id, userID]);
+         if(smth4.rows.length>0) {
+           userReview = smth4.rows[0].review;
+           
+        } 
+    
+        userWebtoons.push({title: webtoonTitle, author: webtoonAuthor, rating: userRating, webtoonID: userWebtoonIDs.rows[i].webtoon_id, 
+            review: userReview
+        });
     }   
     if (userWebtoons.length===0){
         console.log("mhm");
@@ -164,7 +172,6 @@ const addWebtoon = async (req,res)=>{
 };
 
 // Get Rating
-
 const getRating = async (req,res) => {
     const userID = req.user.user_id;
     const{webtoonTitle} = req.query; 
@@ -213,7 +220,6 @@ const addRating = async (req, res)=>{
     res.send(userRating);
 };
 
-
 // Update User-Rating
 const updateRating = async (req,res)=>{
     const userID = req.user.user_id;
@@ -231,11 +237,67 @@ const updateRating = async (req,res)=>{
     
 };
 
+const getReview = async(req,res) => {
+    const userID = req.user.user_id; 
+    const {webtoonTitle} = req.query; 
+    const smth = await pool.query(`SELECT webtoon_id FROM webtoons where title = $1`, [webtoonTitle]);
+    let webtoonID = smth.rows[0].webtoon_id;
+    const review = await pool.query(`SELECT review FROM user_reviews WHERE user_id = $1 AND webtoon_id = $2`, 
+        [userID, webtoonID]); 
+    if(review.rows.length==0) 
+    
+        res.send("");
+    else 
+        res.send(review.rows[0].review);
+    
+
+}
+
+const getUserReviews = async(req, res) => {
+    const userID = req.user.user_id;
+    const reviews =  await pool.query(`SELECT * FROM user_reviews WHERE user_id = $1`, [userID]); 
+    let userReviews = []; 
+    for(let i = 0; i < reviews.rows.length; i++)
+    {
+         const webtoonTitle = await pool.query(`SELECT title FROM webtoons where webtoon_id = $1`, 
+            [reviews.rows[i].webtoon_id]);
+        userReviews.push({review: reviews.rows[i].review, title: webtoonTitle.rows[0].title,});
+    }
+    res.send(userReviews);
+}
+// Add User-Review
 const addReview = async(req, res) => {
     const userID = req.user.user_id; 
     const{webtoonTitle, review} = req.body; 
-    
+    const webtoon = await pool.query(`SELECT webtoon_id FROM webtoons WHERE title = $1`, [webtoonTitle]);
+    const webtoonID = webtoon.rows[0].webtoon_id; 
+    await pool.query(`INSERT INTO user_reviews (user_id, webtoon_id, review) VALUES ($1, $2, $3)`, 
+        [userID, webtoonID, review]);
+    res.send(review);
 
+
+}
+
+// Update User-Review
+const updateReview = async(req,res) => {
+    const userID = req.user.user_id; 
+    const{webtoonTitle, review} = req.body; 
+    const webtoon = await pool.query(`SELECT webtoon_id FROM webtoons where title = $1`, [webtoonTitle]);
+    let webtoonID = webtoon.rows[0].webtoon_id;
+    await pool.query(`UPDATE user_reviews SET review = $1 WHERE user_id = $2 AND webtoon_id = $3`, 
+        [review, userID, webtoonID]);
+    res.send(review);
+}
+
+const deleteReview = async(req,res) =>{
+    const userID = req.user.user_id; 
+    const{webtoonTitle} = req.body; 
+    const webtoon = await pool.query(`SELECT webtoon_id FROM webtoons where title = $1`, [webtoonTitle]);
+    let webtoonID = webtoon.rows[0].webtoon_id;
+    await pool.query(`DELETE FROM user_reviews WHERE user_id = $1 AND webtoon_id = $2`, 
+        [userID, webtoonID]
+    );
+    res.send("Deleted");
 }
 
 // Delete Webtoon 
@@ -302,8 +364,6 @@ const getWebtoonAuthors = async() => {
     }
 }
 
-
-
 const getWebtoonImages = async () => {
     try{
         const browser = await puppeteer.launch(); 
@@ -330,8 +390,6 @@ const getWebtoonImages = async () => {
 }
 
 
-
-
 export{
     signupUser,
     loginUser,
@@ -350,5 +408,9 @@ export{
     authenticateToken,
     deleteWebtoon, 
     getWebtoonImages, 
-    addReview
+    getReview,
+    getUserReviews,
+    addReview, 
+    updateReview, 
+    deleteReview
 }
