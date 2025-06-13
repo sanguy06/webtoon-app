@@ -17,7 +17,8 @@ export default function MyWebtoons () {
     const [userRating, setUserRating] = useState([]);
     const[webtoonID, setWebtoonID] = useState([]);
     const[review, setReview] = useState([]);
-    const [openDialog, setOpenDialog] = useState([]);
+    const [openDialog, setOpenDialog] = useState(null);
+  
     const {id} = useParams();
     
      useEffect(()=>{
@@ -187,15 +188,6 @@ export default function MyWebtoons () {
         );
     }
 
-  
-    const handleOpenDialog = (title) => {
-        setOpenDialog(title, true); 
-    }
-
-    const handleCloseDialog = () => {
-        setOpenDialog(false);
-    }
-
     return (
         <div style={{
             backgroundColor:'pink',
@@ -230,26 +222,31 @@ export default function MyWebtoons () {
                             precision={.5}
                         />   
                     </div>
-                    <button onClick={() => {handleOpenDialog(item.title)}}>Click</button>
+                    <button 
+                      className= "custom-font"
+                                style={{ color: "black", width: "100px", height: "25px", backgroundColor: "pink"}}
+                    onClick={() => {setOpenDialog(item.title)}}>Your Review</button>
                    
                         <Dialog
-                            open={openDialog}
-                            onClose={handleCloseDialog} >
+                            open={openDialog===item.title}
+                            onClose={() => setOpenDialog(null)} >
                             <div style={{
                                 backgroundColor: "pink", 
                                 width: "500px", 
-                                height: "300px", 
+                                height: "475px", 
                                 borderRadius: "10px", 
                                 justifyContent: "center",
                                 display: "flex", 
-                                flexDirection:"column"}}>
-                                <div style={{padding: "25px"}}>
+                                flexDirection:"column",
+                                alignContent: "center"}}>
+                                <div style={{padding: "25px 25px 25px 25px"}}>
                                     <textarea style={{
                                         backgroundColor: "white", 
                                         width: "450px", 
-                                        height: "250px",
+                                        height: "350px",
                                         display: "flex", 
-                                        borderRadius: "10px" }} 
+                                        borderRadius: "10px", 
+                                        padding: "10px 10px 10px 10px"}} 
 
                                         value={item.review} 
 
@@ -257,7 +254,13 @@ export default function MyWebtoons () {
                                             const newReview = e.target.value; 
                                             handleReviewChange(index, newReview)}}></textarea>
                                 </div>
-                                <button onClick={() => {changeReview(item.review,item.title)}}>Submit</button>
+                                <div
+                                style={{display:"flex", justifyContent: "center"}}>
+                                <button 
+                                className= "custom-font"
+                                style={{ color: "black", width: "100px", height: "50px", borderRadius: "10px",backgroundColor: "pink"}}
+                                onClick={() => {changeReview(item.review,item.title)}}>Edit Review</button>
+                                </div>
                             </div>
                         </Dialog> 
                     

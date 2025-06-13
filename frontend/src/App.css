@@ -86,9 +86,20 @@ html, body {
   align-items: center;
   min-width:200px;
   
-  
 }
 
+.search-bar-container-fixed {
+  padding-top:5vh; 
+  width:40%;
+  margin:auto;
+  display:flex;
+  flex-direction:column; 
+  align-items: center;
+  min-width:200px;
+  top: 200px; 
+  left: 35%;
+  position:fixed;
+}
 .results-list{
   width: 100%; 
   background-color: white; 
@@ -162,8 +173,4 @@ li{
   
 }
 
-*{
-    text-decoration: none;
-    
-}
 

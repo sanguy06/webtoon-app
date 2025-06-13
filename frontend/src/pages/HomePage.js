@@ -158,9 +158,11 @@ export default function HomePage() {
             <div style={{display:'flex', gap:'10px', paddingTop: "5vh", marginLeft: '30px', flexDirection:'column'}}>
                 
                 {Array.isArray(webtoons) && webtoons.length > 0 && webtoons.map((item,index)=> (
-                   <a href={`/users/${id}/webtoon-info/${item.webtoonID}`}>
+                   
                    <div key={index} className={"webtoon-wrapper custom-font"}>
-                     <b>{item.title}</b> <div style={{alignContent: "center"}}> 
+                    <a href={`/users/${id}/webtoon-info/${item.webtoonID}`}><b>{item.title}</b> </a>
+                 
+                     <div style={{alignContent: "center"}}> 
                         <IconButton onClick={() => handleDelete(item.title)}><DeleteIcon/></IconButton>
                      </div>
                     <br />
@@ -178,13 +180,13 @@ export default function HomePage() {
                     </div>
                    
                    </div>
-                </a>
+                
                 ))}
             </div>
-            <div className="search-bar-container">
-                                       <SearchBar setResults={setResults}/>
-                                       <SearchResultsList results={results}/>
-                                   </div>
+            <div className="search-bar-container-fixed">
+                <SearchBar setResults={setResults}/>
+                <SearchResultsList results={results}/>
+            </div>
                 
             
 
