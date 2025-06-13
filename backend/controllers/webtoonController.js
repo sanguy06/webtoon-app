@@ -15,7 +15,7 @@ const signupUser = async (req,res)=>{
     const userID = uuidv4();
     const hashedPassword = await bcrypt.hash(req.body.passcode, 10);
     const{user_name, passcode} = {user_name: req.body.user_name, passcode: hashedPassword};
-    const newUser = await pool.query(`INSERT INTO users (user_name, passcode, user_id) VALUES($1, $2, $3)`, 
+    const newUser = await pool.query(`INSERT INTO public.users (user_name, passcode, user_id) VALUES($1, $2, $3)`, 
         [user_name, passcode, userID]);
     res.json(newUser);
 
@@ -25,7 +25,7 @@ const signupUser = async (req,res)=>{
 const loginUser = async (req,res)=>{
     
     const {user_name, passcode} = req.body; 
-    const found = await pool.query(`SELECT passcode FROM users WHERE user_name = $1`,[user_name] );
+    const found = await pool.query(`SELECT passcode FROM public.public.users WHERE user_name = $1`,[user_name] );
     console.log(found.rows[0].passcode);
     if(found.rows.length<0)
     {
@@ -38,7 +38,7 @@ const loginUser = async (req,res)=>{
         if(await bcrypt.compare(passcode, found.rows[0].passcode))
         {
             // generates access token associated with user
-            const smth = await pool.query(`SELECT user_id FROM users WHERE user_name = $1 `, [user_name]);
+            const smth = await pool.query(`SELECT user_id FROM public.users WHERE user_name = $1 `, [user_name]);
             const user_id = smth.rows[0].user_id;
             const user = {user_name, user_id, passcode};
             const accessToken = jwt.sign(user,process.env.ACCESS_TOKEN_SECRET);
@@ -70,7 +70,7 @@ const authUser = (req,res)=>{
 const getUser = async(req,res)=> {
     const {user_name, passcode} = req.body;
     
-    const smth = await pool.query(`SELECT user_id from users where user_name = $1 AND passcode = $2`, 
+    const smth = await pool.query(`SELECT user_id from public.users where user_name = $1 AND passcode = $2`, 
         [user_name, passcode]);
     if(smth.rows.length ===0)
     {
@@ -104,7 +104,7 @@ const searchWebtoons = async (req,res) =>
 {
 
     const {webtoonTitle} = req.query;
-    const webtoonsSearched= await pool.query(`SELECT * FROM webtoons where title ILIKE $1`, [`%${webtoonTitle}%`]);
+    const webtoonsSearched= await pool.query(`SELECT * FROM public.webtoons where title ILIKE $1`, [`%${webtoonTitle}%`]);
     console.log(webtoonsSearched.rows);
     res.json(webtoonsSearched.rows);
 }   
@@ -112,7 +112,7 @@ const searchWebtoons = async (req,res) =>
 const displayWebtoonInfo = async(req,res) => {
     const webtoonID = req.params.webtoonID; 
     console.log(webtoonID);
-    const webtoonDisplayed = await pool.query(`SELECT * FROM webtoons where webtoon_id = $1`, [webtoonID]);
+    const webtoonDisplayed = await pool.query(`SELECT * FROM public.webtoons where webtoon_id = $1`, [webtoonID]);
     res.json(webtoonDisplayed.rows[0]);
 }
 
@@ -122,22 +122,22 @@ const getUserWebtoons = async(req,res)=>
    const userID = req.user.user_id;
     let userWebtoonIDs= [];
     const userWebtoons = [];
-    userWebtoonIDs = await pool.query(`SELECT webtoon_id FROM user_webtoons where user_id = $1`, [userID]);
+    userWebtoonIDs = await pool.query(`SELECT webtoon_id FROM public.user_webtoons where user_id = $1`, [userID]);
     for(let i = 0; i < userWebtoonIDs.rows.length; i++)
     {
         let userRating = 0;
         let userReview = "";
-        const smth = await pool.query(`SELECT title FROM webtoons where webtoon_id = $1`, [userWebtoonIDs.rows[i].webtoon_id]);
+        const smth = await pool.query(`SELECT title FROM public.webtoons where webtoon_id = $1`, [userWebtoonIDs.rows[i].webtoon_id]);
         const webtoonTitle = smth.rows[0].title;
-        const smth2 = await pool.query(`SELECT author FROM webtoons where webtoon_id = $1`, [userWebtoonIDs.rows[i].webtoon_id]);
+        const smth2 = await pool.query(`SELECT author FROM public.webtoons where webtoon_id = $1`, [userWebtoonIDs.rows[i].webtoon_id]);
         const webtoonAuthor = smth2.rows[0].author;
         
-        const smth3 = await pool.query(`SELECT rating FROM user_ratings where webtoon_id = $1 AND user_id = $2`, 
+        const smth3 = await pool.query(`SELECT rating FROM public.user_ratings where webtoon_id = $1 AND user_id = $2`, 
             [userWebtoonIDs.rows[i].webtoon_id, userID]);
         if(smth3.rows.length>0) {
            userRating = smth3.rows[0].rating;
         } 
-         const smth4 = await pool.query(`SELECT review FROM user_reviews where webtoon_id = $1 AND user_id = $2`, 
+         const smth4 = await pool.query(`SELECT review FROM public.user_reviews where webtoon_id = $1 AND user_id = $2`, 
             [userWebtoonIDs.rows[i].webtoon_id, userID]);
          if(smth4.rows.length>0) {
            userReview = smth4.rows[0].review;
@@ -164,10 +164,10 @@ const addWebtoon = async (req,res)=>{
    
     const userID = req.user.user_id;
     const {webtoonTitle} = req.body;
-    const smth = await pool.query(`SELECT webtoon_id FROM webtoons where title = $1`, [webtoonTitle]);
+    const smth = await pool.query(`SELECT webtoon_id FROM public.webtoons where title = $1`, [webtoonTitle]);
     let webtoonID = smth.rows[0].webtoon_id;
     //console.log(webtoonID);
-    await pool.query(`INSERT INTO user_webtoons (user_id, webtoon_id) VALUES($1,$2)`, [userID,webtoonID]);
+    await pool.query(`INSERT INTO public.user_webtoons (user_id, webtoon_id) VALUES($1,$2)`, [userID,webtoonID]);
     res.send(userID);
 };
 
@@ -176,10 +176,10 @@ const getRating = async (req,res) => {
     const userID = req.user.user_id;
     const{webtoonTitle} = req.query; 
     console.log(webtoonTitle);
-     const smth = await pool.query(`SELECT webtoon_id FROM webtoons where title = $1`, [webtoonTitle]);
+     const smth = await pool.query(`SELECT webtoon_id FROM public.webtoons where title = $1`, [webtoonTitle]);
      console.log(smth);
     let webtoonID = smth.rows[0].webtoon_id;
-    const smth2 = await pool.query(`SELECT rating FROM user_ratings where webtoon_id = $1 AND user_id = $2 `, 
+    const smth2 = await pool.query(`SELECT rating FROM public.user_ratings where webtoon_id = $1 AND user_id = $2 `, 
         [webtoonID, userID]);
     if(smth2.rows.length ===0)
         res.send("");
@@ -194,10 +194,10 @@ const getRating = async (req,res) => {
 const getUserRatings = async (req, res) => {
     let userRatings = []; 
     const userID = req.user.user_id; 
-    const ratings = await pool.query(`SELECT * FROM user_ratings where user_id = $1`, [userID]); 
+    const ratings = await pool.query(`SELECT * FROM public.user_ratings where user_id = $1`, [userID]); 
 
     for(let i = 0; i < ratings.rows.length; i++) {
-        const webtoonTitle = await pool.query(`SELECT title FROM webtoons where webtoon_id = $1`, 
+        const webtoonTitle = await pool.query(`SELECT title FROM public.webtoons where webtoon_id = $1`, 
             [ratings.rows[i].webtoon_id]);
         userRatings.push({rating: ratings.rows[i].rating, title: webtoonTitle.rows[0].title,});
     }
@@ -212,10 +212,10 @@ const addRating = async (req, res)=>{
     const userID = req.user.user_id;
     const{webtoonTitle, userRating} = req.body; 
     console.log("rating is " + userRating);
-    const smth = await pool.query(`SELECT webtoon_id FROM webtoons where title = $1`, [webtoonTitle]);
+    const smth = await pool.query(`SELECT webtoon_id FROM public.webtoons where title = $1`, [webtoonTitle]);
     let webtoonID = smth.rows[0].webtoon_id;
     console.log("The ID is" + webtoonID);
-    await pool.query(`INSERT INTO user_ratings (user_id, webtoon_id, rating) VALUES ($1,$2,$3)`, 
+    await pool.query(`INSERT INTO public.user_ratings (user_id, webtoon_id, rating) VALUES ($1,$2,$3)`, 
         [userID, webtoonID, userRating]);
     res.send(userRating);
 };
@@ -226,11 +226,11 @@ const updateRating = async (req,res)=>{
     const{webtoonTitle, userRating} = req.body; 
     console.log("title is " + webtoonTitle);
     console.log("rating is " + userRating);
-    const smth = await pool.query(`SELECT webtoon_id FROM webtoons where title = $1`, [webtoonTitle]);
+    const smth = await pool.query(`SELECT webtoon_id FROM public.webtoons where title = $1`, [webtoonTitle]);
     
     let webtoonID = smth.rows[0].webtoon_id;
     
-    await pool.query(`UPDATE user_ratings SET rating = $1 WHERE user_id = $2 AND webtoon_id = $3`, 
+    await pool.query(`UPDATE public.user_ratings SET rating = $1 WHERE user_id = $2 AND webtoon_id = $3`, 
         [userRating, userID, webtoonID]);
     
     res.send(userRating);
@@ -240,9 +240,9 @@ const updateRating = async (req,res)=>{
 const getReview = async(req,res) => {
     const userID = req.user.user_id; 
     const {webtoonTitle} = req.query; 
-    const smth = await pool.query(`SELECT webtoon_id FROM webtoons where title = $1`, [webtoonTitle]);
+    const smth = await pool.query(`SELECT webtoon_id FROM public.webtoons where title = $1`, [webtoonTitle]);
     let webtoonID = smth.rows[0].webtoon_id;
-    const review = await pool.query(`SELECT review FROM user_reviews WHERE user_id = $1 AND webtoon_id = $2`, 
+    const review = await pool.query(`SELECT review FROM public.user_reviews WHERE user_id = $1 AND webtoon_id = $2`, 
         [userID, webtoonID]); 
     if(review.rows.length==0) 
     {
@@ -257,11 +257,11 @@ const getReview = async(req,res) => {
 
 const getUserReviews = async(req, res) => {
     const userID = req.user.user_id;
-    const reviews =  await pool.query(`SELECT * FROM user_reviews WHERE user_id = $1`, [userID]); 
+    const reviews =  await pool.query(`SELECT * FROM public.user_reviews WHERE user_id = $1`, [userID]); 
     let userReviews = []; 
     for(let i = 0; i < reviews.rows.length; i++)
     {
-         const webtoonTitle = await pool.query(`SELECT title FROM webtoons where webtoon_id = $1`, 
+         const webtoonTitle = await pool.query(`SELECT title FROM public.webtoons where webtoon_id = $1`, 
             [reviews.rows[i].webtoon_id]);
         userReviews.push({review: reviews.rows[i].review, title: webtoonTitle.rows[0].title,});
     }
@@ -271,9 +271,9 @@ const getUserReviews = async(req, res) => {
 const addReview = async(req, res) => {
     const userID = req.user.user_id; 
     const{webtoonTitle, review} = req.body; 
-    const webtoon = await pool.query(`SELECT webtoon_id FROM webtoons WHERE title = $1`, [webtoonTitle]);
+    const webtoon = await pool.query(`SELECT webtoon_id FROM public.webtoons WHERE title = $1`, [webtoonTitle]);
     const webtoonID = webtoon.rows[0].webtoon_id; 
-    await pool.query(`INSERT INTO user_reviews (user_id, webtoon_id, review) VALUES ($1, $2, $3)`, 
+    await pool.query(`INSERT INTO public.user_reviews (user_id, webtoon_id, review) VALUES ($1, $2, $3)`, 
         [userID, webtoonID, review]);
     res.send(review);
 
@@ -284,9 +284,9 @@ const addReview = async(req, res) => {
 const updateReview = async(req,res) => {
     const userID = req.user.user_id; 
     const{webtoonTitle, review} = req.body; 
-    const webtoon = await pool.query(`SELECT webtoon_id FROM webtoons where title = $1`, [webtoonTitle]);
+    const webtoon = await pool.query(`SELECT webtoon_id FROM public.webtoons where title = $1`, [webtoonTitle]);
     let webtoonID = webtoon.rows[0].webtoon_id;
-    await pool.query(`UPDATE user_reviews SET review = $1 WHERE user_id = $2 AND webtoon_id = $3`, 
+    await pool.query(`UPDATE public.user_reviews SET review = $1 WHERE user_id = $2 AND webtoon_id = $3`, 
         [review, userID, webtoonID]);
     res.send(review);
 }
@@ -294,9 +294,9 @@ const updateReview = async(req,res) => {
 const deleteReview = async(req,res) =>{
     const userID = req.user.user_id; 
     const{webtoonTitle} = req.body; 
-    const webtoon = await pool.query(`SELECT webtoon_id FROM webtoons where title = $1`, [webtoonTitle]);
+    const webtoon = await pool.query(`SELECT webtoon_id FROM public.webtoons where title = $1`, [webtoonTitle]);
     let webtoonID = webtoon.rows[0].webtoon_id;
-    await pool.query(`DELETE FROM user_reviews WHERE user_id = $1 AND webtoon_id = $2`, 
+    await pool.query(`DELETE FROM public.user_reviews WHERE user_id = $1 AND webtoon_id = $2`, 
         [userID, webtoonID]
     );
     res.send("Deleted");
@@ -308,11 +308,11 @@ const deleteWebtoon = async (req, res)=>{
     console.log(userID);
     const{webtoonTitle} = req.query; 
     console.log(webtoonTitle);
-    const smth = await pool.query(`SELECT webtoon_id FROM webtoons where title = $1`, [webtoonTitle]);
+    const smth = await pool.query(`SELECT webtoon_id FROM public.webtoons where title = $1`, [webtoonTitle]);
     let webtoonID = smth.rows[0].webtoon_id;
     console.log(webtoonID);
-    await pool.query(`DELETE FROM user_webtoons WHERE webtoon_id = $1 AND user_id = $2`, [webtoonID, userID]);
-    await pool.query(`DELETE FROM user_ratings WHERE webtoon_id = $1 AND user_id = $2`, [webtoonID, userID]);
+    await pool.query(`DELETE FROM public.user_webtoons WHERE webtoon_id = $1 AND user_id = $2`, [webtoonID, userID]);
+    await pool.query(`DELETE FROM public.user_ratings WHERE webtoon_id = $1 AND user_id = $2`, [webtoonID, userID]);
     res.send("deleted");
 };
 
@@ -320,7 +320,7 @@ const deleteWebtoon = async (req, res)=>{
 const fetchWebtoons = async (req,res)=>{
     const webtoonTitles = await getWebtoonTitles();
     const webtoonAuthors = await getWebtoonAuthors();
-    await pool.query(`INSERT INTO webtoons (title, author) SELECT * FROM unnest($1::text[],$2::text[]) AS t(title, author)`, [webtoonTitles,webtoonAuthors]);
+    await pool.query(`INSERT INTO public.webtoons (title, author) SELECT * FROM unnest($1::text[],$2::text[]) AS t(title, author)`, [webtoonTitles,webtoonAuthors]);
     //await pool.query(`INSERT INTO webtoons (title) SELECT * FROM unnest ($1::text[])`, [webtoonTitles]);
     
 }
