@@ -17,7 +17,7 @@ export default function MyWebtoons () {
     const [userRating, setUserRating] = useState([]);
     const[webtoonID, setWebtoonID] = useState([]);
     const[review, setReview] = useState([]);
-    const [openDialog, setOpenDialog] = useState();
+    const [openDialog, setOpenDialog] = useState([]);
     const {id} = useParams();
     
      useEffect(()=>{
@@ -135,7 +135,7 @@ export default function MyWebtoons () {
         }
     }
     const changeReview = async(userReview, title) => {
-        /*
+        
         const ogReview = await axios.get(`http://localhost:5555/users/${id}/get-review?webtoonTitle=${title}`, {
             headers: {
                 Authorization:  `Bearer ${token}`
@@ -143,6 +143,8 @@ export default function MyWebtoons () {
         })
         if(ogReview.data==="")
         {
+            console.log("thinks review is empty");
+            
             await axios.post(`http://localhost:5555/users/${id}/add-review`, {
             webtoonTitle: title, 
             review: userReview}, 
@@ -152,7 +154,9 @@ export default function MyWebtoons () {
                 }
             })
         } 
-        else {*/
+        else 
+        {
+            console.log("thinks review is not empty. updating");
             await axios.post(`http://localhost:5555/users/${id}/update-review`, {
                 webtoonTitle: title, 
                 review: userReview } ,
@@ -163,8 +167,10 @@ export default function MyWebtoons () {
                 })
             
         }
+    }
     
     const handleRatingChange = (index, newRating) => {
+        console.log(index);
         setWebtoons(prev => 
             prev.map((webtoon, i) => 
             i === index ? {...webtoon, rating: newRating} : webtoon
@@ -173,6 +179,7 @@ export default function MyWebtoons () {
     }
 
     const handleReviewChange = (index, newReview) => {
+        console.log(index);
         setWebtoons(prev => 
             prev.map((webtoon, i) => 
             i === index ? {...webtoon, review: newReview} : webtoon
@@ -180,8 +187,9 @@ export default function MyWebtoons () {
         );
     }
 
-    const handleOpenDialog = () => {
-        setOpenDialog(true); 
+  
+    const handleOpenDialog = (title) => {
+        setOpenDialog(title, true); 
     }
 
     const handleCloseDialog = () => {
@@ -203,7 +211,7 @@ export default function MyWebtoons () {
                 
                 {Array.isArray(webtoons) && webtoons.length > 0 && webtoons.map((item,index)=> (
                    
-                   <div key={index} className={"webtoon-wrapper custom-font"}>
+                <div key={index} className={"webtoon-wrapper custom-font"}>
                     <a href={`/users/${id}/webtoon-info/${item.webtoonID}`}>
                     <b>{item.title}</b> </a>
                      <div style={{alignItems:"center"}}> 
@@ -222,13 +230,11 @@ export default function MyWebtoons () {
                             precision={.5}
                         />   
                     </div>
-                    <button onClick={handleOpenDialog}>Click</button>
-                    <div>
-
+                    <button onClick={() => {handleOpenDialog(item.title)}}>Click</button>
+                   
                         <Dialog
                             open={openDialog}
-                            onClose={handleCloseDialog}
-                        >
+                            onClose={handleCloseDialog} >
                             <div style={{
                                 backgroundColor: "pink", 
                                 width: "500px", 
@@ -238,23 +244,25 @@ export default function MyWebtoons () {
                                 display: "flex", 
                                 flexDirection:"column"}}>
                                 <div style={{padding: "25px"}}>
-                                <textarea style={{
-                                    backgroundColor: "white", 
-                                    width: "450px", 
-                                    height: "250px",
-                                    display: "flex", 
-                                    borderRadius: "10px" }} 
+                                    <textarea style={{
+                                        backgroundColor: "white", 
+                                        width: "450px", 
+                                        height: "250px",
+                                        display: "flex", 
+                                        borderRadius: "10px" }} 
 
-                                    value={item.review} 
+                                        value={item.review} 
 
-                                    onChange={(e)=>{setReview(e.target.value)}}></textarea>
+                                        onChange={(e) => {
+                                            const newReview = e.target.value; 
+                                            handleReviewChange(index, newReview)}}></textarea>
                                 </div>
-                                <button onClick={changeReview}>Submit</button>
+                                <button onClick={() => {changeReview(item.review,item.title)}}>Submit</button>
                             </div>
                         </Dialog> 
-                    </div>
+                    
                    
-                   </div>
+                </div>
               
                 ))}
             </div>

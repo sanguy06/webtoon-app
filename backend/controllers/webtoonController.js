@@ -245,8 +245,10 @@ const getReview = async(req,res) => {
     const review = await pool.query(`SELECT review FROM user_reviews WHERE user_id = $1 AND webtoon_id = $2`, 
         [userID, webtoonID]); 
     if(review.rows.length==0) 
-    
+    {
+        console.log("review doesn't exist on backend");
         res.send("");
+    }
     else 
         res.send(review.rows[0].review);
     
