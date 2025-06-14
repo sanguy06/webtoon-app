@@ -9,7 +9,7 @@ export default function UserNotFound() {
     const handleClick = async (e) =>{
         try
         {
-            await axios.post("https://webtoon-app-production.up.railway.app/users/login", {
+            await axios.post("http://localhost:5555/users/login", {
                 user_name: name, 
                 passcode: password
             })

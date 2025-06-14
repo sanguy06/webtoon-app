@@ -31,7 +31,7 @@ export default function WebtoonInfo() {
     // grab info on that specific webtoon
     const fetchWebtoonInfo = async() => {
 
-        webtoon = await axios.post(`https://webtoon-app-production.up.railway.app/webtoon-info/${webtoonID}`);
+        webtoon = await axios.post(`http://localhost:5555/webtoon-info/${webtoonID}`);
         console.log(webtoon.data);
         
         setTitle(webtoon.data.title);
@@ -43,7 +43,7 @@ export default function WebtoonInfo() {
     const getRating = async(title) => {
        
         try {
-            await axios.get(`https://webtoon-app-production.up.railway.app/users/${id}/get-rating?webtoonTitle=${title}`, {
+            await axios.get(`http://localhost:5555/users/${id}/get-rating?webtoonTitle=${title}`, {
                 headers:{
                     Authorization: `Bearer ${token}`
                 }
@@ -59,7 +59,7 @@ export default function WebtoonInfo() {
     const handleClick = async () => {
         
         try{
-            await axios.post(`https://webtoon-app-production.up.railway.app/users/${id}/add-webtoons`, {webtoonTitle: title} , 
+            await axios.post(`http://localhost:5555/users/${id}/add-webtoons`, {webtoonTitle: title} , 
                 {
                 headers:{
                     Authorization: `Bearer ${token}`
@@ -77,7 +77,7 @@ export default function WebtoonInfo() {
     
     const changeRating = async (value) => {
         //console.log("userRating at infoPage is " + value);
-        const addWebton = await axios.get(`https://webtoon-app-production.up.railway.app/users/${id}/my-webtoons`, {
+        const addWebton = await axios.get(`http://localhost:5555/users/${id}/my-webtoons`, {
             headers:{
                     Authorization: `Bearer ${token}`
                 }
@@ -86,7 +86,7 @@ export default function WebtoonInfo() {
             
             if(res.data===""||!res.data.some(item=>item.title === title)){
                 console.log("smth happened");
-                await axios.post(`https://webtoon-app-production.up.railway.app/users/${id}/add-webtoons`, {
+                await axios.post(`http://localhost:5555/users/${id}/add-webtoons`, {
                     webtoonTitle: title
                 }, {
                     headers:{
@@ -97,7 +97,7 @@ export default function WebtoonInfo() {
         });
 
         
-        const ogRating = await axios.get(`https://webtoon-app-production.up.railway.app/users/${id}/get-rating?webtoonTitle=${title}`, {
+        const ogRating = await axios.get(`http://localhost:5555/users/${id}/get-rating?webtoonTitle=${title}`, {
                 headers:{
                     Authorization: `Bearer ${token}`
                 }
@@ -106,7 +106,7 @@ export default function WebtoonInfo() {
           
         if(ogRating.data==="")
         {
-            await axios.post(`https://webtoon-app-production.up.railway.app/users/${id}/my-webtoons-ratings`, {
+            await axios.post(`http://localhost:5555/users/${id}/my-webtoons-ratings`, {
             webtoonTitle: title, 
             userRating: value}, 
             {
@@ -116,7 +116,7 @@ export default function WebtoonInfo() {
             })
         } else 
         {
-        await axios.post(`https://webtoon-app-production.up.railway.app/users/${id}/update-my-webtoons-ratings`, {
+        await axios.post(`http://localhost:5555/users/${id}/update-my-webtoons-ratings`, {
             webtoonTitle: title, 
             userRating: value } ,
             {
