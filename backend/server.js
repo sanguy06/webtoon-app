@@ -43,7 +43,7 @@ app.get('/',(req, res) =>{
     console.log(req);
     return res.status(234).send("Welcome");
 })
-
+app.get('/ping', (req,res)=>res.send('pong'));
 // Fetch Users - for testing
 app.get('/users', async (req,res)=>{
     const usersData = await pool.query(`SELECT * FROM users`);
