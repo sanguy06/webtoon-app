@@ -18,7 +18,7 @@ export default function MyWebtoons () {
     const[webtoonID, setWebtoonID] = useState([]);
     const[review, setReview] = useState([]);
     const [openDialog, setOpenDialog] = useState(null);
-  
+    const API_URL = process.env.REACT_APP_API_URL
     const {id} = useParams();
     
      useEffect(()=>{
@@ -34,7 +34,7 @@ export default function MyWebtoons () {
 
     const getWebtoons = async(e) => {
         try{
-            await axios.get(`http://localhost:5555/users/${id}/my-webtoons`, {
+            await axios.get(`${API_URL}/users/${id}/my-webtoons`, {
                 headers:{
                     Authorization: `Bearer ${token}`
                 }
@@ -50,7 +50,7 @@ export default function MyWebtoons () {
     
     const getWebtoonID = async(e) => {
          try{
-            await axios.get(`http://localhost:5555/users/${id}/my-webtoons`, {
+            await axios.get(`${API_URL}/users/${id}/my-webtoons`, {
                 headers:{
                     Authorization: `Bearer ${token}`
                 }
@@ -66,7 +66,7 @@ export default function MyWebtoons () {
 
     const getRating = async (e) => {
         try {
-            await axios.get(`http://localhost:5555/users/${id}/get-my-ratings`, { 
+            await axios.get(`${API_URL}/users/${id}/get-my-ratings`, { 
                 headers:{
                 Authorization: `Bearer ${token}`
             }})
@@ -81,7 +81,7 @@ export default function MyWebtoons () {
     
     const getReview = async(e) => {
         try{
-            await axios.get(`http://localhost:5555/users/${id}/get-my-reviews`, { 
+            await axios.get(`${API_URL}/users/${id}/get-my-reviews`, { 
                 headers:{
                 Authorization: `Bearer ${token}`
             }})
@@ -95,7 +95,7 @@ export default function MyWebtoons () {
         }
     }
     const handleDelete = async (title) => {
-        await axios.delete(`http://localhost:5555/users/${id}/my-webtoons?webtoonTitle=${title}`, {
+        await axios.delete(`${API_URL}/users/${id}/my-webtoons?webtoonTitle=${title}`, {
             headers:{
                 Authorization: `Bearer ${token}`
             }
@@ -107,14 +107,14 @@ export default function MyWebtoons () {
     
     const changeRating = async (rating, title) => {
       
-        const ogRating = await axios.get(`http://localhost:5555/users/${id}/get-rating?webtoonTitle=${title}`, {
+        const ogRating = await axios.get(`${API_URL}/users/${id}/get-rating?webtoonTitle=${title}`, {
                 headers:{
                     Authorization: `Bearer ${token}`
                 }
             }) 
         if(ogRating.data==="")
         {
-            await axios.post(`http://localhost:5555/users/${id}/my-webtoons-ratings`, {
+            await axios.post(`${API_URL}/users/${id}/my-webtoons-ratings`, {
             webtoonTitle: title, 
             userRating: rating}, 
             {
@@ -125,7 +125,7 @@ export default function MyWebtoons () {
         } 
         else 
         {
-        await axios.post(`http://localhost:5555/users/${id}/update-my-webtoons-ratings`, {
+        await axios.post(`${API_URL}/users/${id}/update-my-webtoons-ratings`, {
             webtoonTitle: title, 
             userRating: rating } ,
             {
@@ -137,7 +137,7 @@ export default function MyWebtoons () {
     }
     const changeReview = async(userReview, title) => {
         
-        const ogReview = await axios.get(`http://localhost:5555/users/${id}/get-review?webtoonTitle=${title}`, {
+        const ogReview = await axios.get(`${API_URL}/users/${id}/get-review?webtoonTitle=${title}`, {
             headers: {
                 Authorization:  `Bearer ${token}`
             }
@@ -146,7 +146,7 @@ export default function MyWebtoons () {
         {
             console.log("thinks review is empty");
             
-            await axios.post(`http://localhost:5555/users/${id}/add-review`, {
+            await axios.post(`${API_URL}/users/${id}/add-review`, {
             webtoonTitle: title, 
             review: userReview}, 
             {
@@ -158,7 +158,7 @@ export default function MyWebtoons () {
         else 
         {
             console.log("thinks review is not empty. updating");
-            await axios.post(`http://localhost:5555/users/${id}/update-review`, {
+            await axios.post(`${API_URL}/users/${id}/update-review`, {
                 webtoonTitle: title, 
                 review: userReview } ,
                 {

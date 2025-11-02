@@ -7,9 +7,10 @@ export default function Login(){
     const[name, setName] = useState("");
     const[password, setPassword] = useState("");
     const navigate = useNavigate();
+    const API_URL = process.env.REACT_APP_API_URL
     const handleClick = async (e) =>{
         try{
-        await axios.post("http://localhost:5555/users/login", {
+        await axios.post(`${API_URL}/users/login`, {
                 user_name: name, 
                 passcode: password
             })

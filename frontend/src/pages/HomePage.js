@@ -22,7 +22,7 @@ export default function HomePage() {
     const[webtoonID, setWebtoonID] = useState([]);
     const [results, setResults] = useState([]);
 
-    
+    const API_URL = process.env.REACT_APP_API_URL
     
      useEffect(()=>{
             getWebtoons();
@@ -36,14 +36,13 @@ export default function HomePage() {
 
     const getWebtoons = async(e) => {
         try{
-            await axios.get(`http://localhost:5555/users/${id}/my-webtoons`, {
+            await axios.get(`${API_URL}/users/${id}/my-webtoons`, {
                 headers:{
                     Authorization: `Bearer ${token}`
                 }
             })
             .then (res => {
                 setWebtoons(res.data.splice(0,3));
-                //setWebtoons(webtoons.splice(0,3));
                
             })
         } catch (err){
@@ -53,7 +52,7 @@ export default function HomePage() {
     
     const getWebtoonID = async(e) => {
          try{
-            await axios.get(`http://localhost:5555/users/${id}/my-webtoons`, {
+            await axios.get(`${API_URL}/users/${id}/my-webtoons`, {
                 headers:{
                     Authorization: `Bearer ${token}`
                 }
@@ -68,7 +67,7 @@ export default function HomePage() {
     }
     const getRating = async (e) => {
         try {
-            await axios.get(`http://localhost:5555/users/${id}/get-my-ratings`,  {
+            await axios.get(`${API_URL}/users/${id}/get-my-ratings`,  {
             headers:{
                 Authorization: `Bearer ${token}`
             } })
@@ -82,7 +81,7 @@ export default function HomePage() {
     }
         
     const handleDelete = async (title) => {
-        await axios.delete(`http://localhost:5555/users/${id}/my-webtoons?webtoonTitle=${title}`, {
+        await axios.delete(`${API_URL}/users/${id}/my-webtoons?webtoonTitle=${title}`, {
             headers:{
                 Authorization: `Bearer ${token}`
             }
@@ -97,7 +96,7 @@ export default function HomePage() {
     const changeRating = async (rating, title) => {
     
         
-        const ogRating = await axios.get(`http://localhost:5555/users/${id}/get-rating?webtoonTitle=${title}`, {
+        const ogRating = await axios.get(`${API_URL}/users/${id}/get-rating?webtoonTitle=${title}`, {
                 headers:{
                     Authorization: `Bearer ${token}`
                 }
@@ -105,7 +104,7 @@ export default function HomePage() {
           
         if(ogRating.data==="")
         {
-            await axios.post(`http://localhost:5555/users/${id}/my-webtoons-ratings`, {
+            await axios.post(`${API_URL}/users/${id}/my-webtoons-ratings`, {
             webtoonTitle: title, 
             userRating: rating}, 
             {
@@ -115,7 +114,7 @@ export default function HomePage() {
             })
         } else 
         {
-        await axios.post(`http://localhost:5555/users/${id}/update-my-webtoons-ratings`, {
+        await axios.post(`{${API_URL}/users/${id}/update-my-webtoons-ratings`, {
             webtoonTitle: title, 
             userRating: rating } ,
             {
@@ -128,11 +127,6 @@ export default function HomePage() {
     }
 
     const handleRatingChange = (index, newRating) => {
-        //<a href={`/users/${id}/webtoon-info/${webtoonID}`}>
-        /**  width:'150px', 
-                    height: '150px', 
-                    backgroundColor: 'pink',
-                    border: '1px solid black', */
         setWebtoons(prev => 
             prev.map((webtoon, i) => 
             i === index ? {...webtoon, rating: newRating} : webtoon
