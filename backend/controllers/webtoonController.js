@@ -1,6 +1,5 @@
 
 import {pool} from '../config/connectToPG.js';
-//import { cloudinary } from '../config/connectToCloud.js';
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import cors from "cors";
