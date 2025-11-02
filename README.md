@@ -7,7 +7,13 @@ This app allows users to add, leave ratings and reviews, and delete WEBTOONS fro
 * Interactive Search Bar
 * Rating and Review Features for each WEBTOON 
 
-# Example 
+# Demo
+* Deployed Here: https://webtoon-app-ashen.vercel.app/
+
+# Future Goals
+* Cleaner UI
+* Add images to WEBTOONS
+* Add public user discussion system. So far, the application only supports viewing personal data. 
 
 
 
